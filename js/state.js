@@ -9,6 +9,7 @@ applyState(S);
 const save=()=>{
   try{S.updatedAt=new Date().toISOString();localStorage.setItem(K,JSON.stringify(S))}catch(e){}
   if(window.Backup)Backup.touch();
+  if(window.Cloud)Cloud.touch();
 };
 function applyState(next){
   S=next;S.salary=S.salary||{};S.items=S.items||[];S.paid=S.paid||{};

@@ -5,18 +5,23 @@ function gaugeBg(){
 }
 function render(){
   $('ml').textContent=lab(cur);$('tt').textContent=Math.round(TETO*100);
-  const h=health(cur),c='var(--'+(h.lv==='none'?'mu':h.lv)+')',rs=rows(cur);
+  const h=health(cur),c='var(--'+(h.lv==='none'?'mu':h.lv)+')',all=rows(cur),rs=all.filter(r=>!r.who);
   const salVal=S.salary[cur]!==undefined?S.salary[cur]:sal(cur);
   $('hero').style.setProperty('--c',c);
   $('hero').innerHTML='<div class="top"><div><p class="verdict">'+h.t+'</p><p>'+h.d+'</p>'+
    '<div class="gauge" style="background:'+gaugeBg()+'"><i style="left:'+Math.min(h.p*100,100)+'%"></i></div><div class="scale" style="position:relative"><span>0%</span><span style="position:absolute;left:'+Math.round(TETO*100)+'%;transform:translateX(-50%)">teto '+Math.round(TETO*100)+'%</span><span>100%</span></div></div>'+
-   '<div><label for="sl">Salário em '+lab(cur)+'</label><input id="sl" inputmode="decimal" value="'+(salVal?String(salVal).replace('.',','):'')+'" placeholder="0,00"><p class="empty" style="margin:6px 0 0;font-size:13px">Vale para os meses seguintes até você alterar. Apague o campo para remover este valor.</p></div></div>';
+   '<div><label for="sl">Salário em '+lab(cur)+'</label><input id="sl" inputmode="decimal" value="'+(salVal?String(salVal).replace('.',','):'')+'" placeholder="0,00"><p class="empty" style="margin:6px 0 0;font-size:13px">Vale também para os meses seguintes. Apague o campo para remover.</p></div></div>';
   $('sl').onchange=e=>{const v=parseFloat(e.target.value.replace(/\./g,'').replace(',','.'));if(e.target.value.trim()===''){withUndo('Salário removido',()=>{delete S.salary[cur]});return}if(isNaN(v)||v<0)return;S.salary[cur]=v;save();render()};
   const saldo=h.s-h.g;
   const pg=rs.filter(r=>S.paid[r.id+'|'+cur]).reduce((a,r)=>a+r.val,0),real=h.s-pg;
-  const kp=[['Salário',R(h.s)],['Gastos do mês',R(h.g)],['Saldo previsto',R(saldo),h.s?(saldo<0?'bd':'ok'):''],['Já pago',R(pg)],['Falta pagar',R(h.g-pg)],['Saldo real na conta',R(real),h.s?(real<0?'bd':'ok'):'']];
+  const kp=[['Salário',R(h.s)],['Gastos',R(h.g)],['Saldo previsto',R(saldo),h.s?(saldo<0?'bd':'ok'):''],['Já pago',R(pg)],['Falta pagar',R(h.g-pg)],['Saldo real',R(real),h.s?(real<0?'bd':'ok'):'']];
   $('kpis').innerHTML=kp.map(k=>'<div class="card"><small>'+k[0]+'</small><strong'+(k[2]?' style="color:var(--'+k[2]+')"':'')+'>'+k[1]+'</strong></div>').join('');
-  $('list').innerHTML=rs.length?rs.sort((a,b)=>b.val-a.val).map(r=>'<div class="row'+(S.paid[r.id+'|'+cur]?' pd':'')+'"><input type="checkbox" class="ck" aria-label="Pago: '+esc(r.name)+'" title="Marcar como pago" data-p="'+r.id+'"'+(S.paid[r.id+'|'+cur]?' checked':'')+'><div>'+esc(r.name)+'<small>'+esc(r.cat)+'</small></div>'+(r.rec?'<span class="pill">↻ mensal</span>':r.n>1?'<span class="pill">'+r.k+'/'+r.n+'</span>':'<span></span>')+'<strong>'+R(r.val)+'</strong><button title="Editar" aria-label="Editar '+esc(r.name)+'" data-e="'+r.id+'">✎</button><button title="'+(r.rec?'Excluir tudo, inclusive o histórico (para manter o histórico, use Editar e Encerrar recorrência)':r.n>1?'Excluir a compra inteira (todas as parcelas)':'Excluir')+'" aria-label="Excluir '+esc(r.name)+'" data-id="'+r.id+'">✕</button></div>').join(''):'<p class="empty">Nenhum gasto em '+lab(cur)+'. Adicione o primeiro ao lado.</p>';
+  const ot=all.filter(r=>r.who),by2={};
+  ot.forEach(r=>{const o=by2[r.who]||(by2[r.who]={t:0,p:0});o.t+=r.val;if(S.paid[r.id+'|'+cur])o.p+=r.val});
+  $('oth').hidden=!ot.length;
+  $('oth').innerHTML=ot.length?'<h2>Gastos de outras pessoas</h2><p class="empty" style="margin:-6px 0 6px;font-size:13px">Não entram nos seus totais. Marque como reembolsado quando a pessoa pagar.</p>'+Object.entries(by2).map(([n,o])=>'<div class="orow"><b>'+esc(n)+'</b><span>Total '+R(o.t)+'</span><span>Reembolsado '+R(o.p)+'</span><strong>A receber '+R(o.t-o.p)+'</strong></div>').join(''):'';
+  $('pp').innerHTML=[...new Set(S.items.flatMap(i=>[i.who,...Object.values(i.ov||{}).map(o=>o.who)]).filter(Boolean))].map(n=>'<option value="'+esc(n)+'">').join('');
+  $('list').innerHTML=all.length?all.sort((a,b)=>(a.who?1:0)-(b.who?1:0)||b.val-a.val).map(r=>'<div class="row'+(S.paid[r.id+'|'+cur]?' pd':'')+'"><input type="checkbox" class="ck" aria-label="'+(r.who?'Reembolsado: ':'Pago: ')+esc(r.name)+'" title="'+(r.who?'Marcar como reembolsado':'Marcar como pago')+'" data-p="'+r.id+'"'+(S.paid[r.id+'|'+cur]?' checked':'')+'><div class="nm"><b>'+esc(r.name)+'</b><small>'+esc(r.cat)+(r.who?' <span class="pill who">de '+esc(r.who)+'</span>':'')+(r.rec?' <span class="pill">↻ mensal</span>':r.n>1?' <span class="pill">parcela '+r.k+'/'+r.n+'</span>':'')+'</small></div><strong>'+R(r.val)+'</strong><div class="ac"><button title="Editar" aria-label="Editar '+esc(r.name)+'" data-e="'+r.id+'">✎</button><button title="'+(r.rec?'Excluir tudo, inclusive o histórico (para manter o histórico, use Editar e Encerrar recorrência)':r.n>1?'Excluir a compra inteira (todas as parcelas)':'Excluir')+'" aria-label="Excluir '+esc(r.name)+'" data-id="'+r.id+'">✕</button></div></div>').join(''):'<p class="empty">Nenhum gasto em '+lab(cur)+'. Use “Novo gasto” para adicionar o primeiro.</p>';
   document.querySelectorAll('#list [data-id]').forEach(b=>b.onclick=()=>{removeItem(b.dataset.id)});
   document.querySelectorAll('#list [data-e]').forEach(b=>b.onclick=()=>openEd(b.dataset.e));
   document.querySelectorAll('#list [data-p]').forEach(b=>b.onchange=()=>{const k=b.dataset.p+'|'+cur;if(b.checked)S.paid[k]=true;else delete S.paid[k];save();render()});

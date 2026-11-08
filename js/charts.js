@@ -7,7 +7,7 @@ function charts(h,rs){
   const by={};rs.forEach(r=>by[r.cat]=(by[r.cat]||0)+r.val);
   const ks=CATS.filter(c=>by[c]);
   ch.a=new Chart($('c1'),{type:'doughnut',data:{labels:ks,datasets:[{data:ks.map(k=>by[k]),backgroundColor:ks.map(k=>COL[CATS.indexOf(k)%COL.length]),borderColor:cssv('--sf'),borderWidth:2}]},
-   options:{maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:'right',labels:{color:ink,boxWidth:12}},tooltip:{callbacks:{label:c=>' '+c.label+': '+R(c.raw)+' ('+Math.round(c.raw/h.g*100)+'%)'}}}}});
+   options:{maintainAspectRatio:false,cutout:'58%',plugins:{legend:{position:innerWidth<720?'bottom':'right',labels:{color:ink,boxWidth:12}},tooltip:{callbacks:{label:c=>' '+c.label+': '+R(c.raw)+' ('+Math.round(c.raw/h.g*100)+'%)'}}}}});
   const ms=Array.from({length:12},(_,i)=>add(cur,i-1));
   const cl={ok:cssv('--ok'),wn:cssv('--wn'),bd:cssv('--bd')};
   ch.b=new Chart($('c2'),{data:{labels:ms.map(sh),datasets:[
