@@ -21,6 +21,7 @@ function fillFilters(all){
   $('fs').value=F.st;
   const nf=(F.cat?1:0)+(F.who?1:0)+(F.st?1:0);
   $('fsm').textContent='Filtros'+(nf?' ('+nf+')':'');
+  $('fclr').hidden=!(F.q||nf);
 }
 function rowHtml(r){
   const p=isPaid(r),on=SELM&&SEL.has(r.id);
@@ -94,6 +95,7 @@ $('q').addEventListener('input',()=>{F.q=$('q').value;renderList(LASTALL)});
 $('fc').onchange=()=>{F.cat=$('fc').value;renderList(LASTALL)};
 $('fw').onchange=()=>{F.who=$('fw').value;renderList(LASTALL)};
 $('fs').onchange=()=>{F.st=$('fs').value;renderList(LASTALL)};
+$('fclr').onclick=()=>{F.q=F.cat=F.who=F.st='';$('q').value='';renderList(LASTALL)};
 document.querySelectorAll('.seg [data-v]').forEach(b=>b.onclick=()=>{VIEW=b.dataset.v;if(VIEW==='f')SELM=false;renderList(LASTALL)});
 /* deslizar: direita = pago/pendente, esquerda = excluir (com Desfazer) */
 let sw=null;

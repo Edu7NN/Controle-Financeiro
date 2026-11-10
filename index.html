@@ -37,13 +37,23 @@
 <div class="lh"><h2>Gastos do mês</h2><button class="s sm" id="selb">Selecionar</button></div>
 <input id="q" type="search" placeholder="Buscar gasto" aria-label="Buscar gasto" autocomplete="off">
 <details id="flt" class="flt"><summary id="fsm">Filtros</summary><div class="fl"><select id="fc" aria-label="Categoria"></select><select id="fw" aria-label="Pessoa"></select><select id="fs" aria-label="Situação"><option value="">Todos</option><option value="p">Pendentes</option><option value="g">Pagos</option></select></div></details>
-<p id="lsum" class="empty"></p>
+<div class="ls"><p id="lsum" class="empty"></p><button class="s sm" id="fclr" hidden>Limpar filtros</button></div>
 <div id="list"></div>
 </section>
 <section class="card" id="v-f" hidden><h2>Faturas do cartão</h2><div id="fat"></div></section>
 </div>
 
 <div class="pane" id="pane-an" hidden>
+<div class="grid" style="margin-bottom:16px">
+<section class="card"><h2>Composição do mês</h2><div id="comp"></div></section>
+<section class="card"><h2>Gastos por categoria</h2><div id="catbars"></div></section>
+</div>
+<section class="card"><h2>Projeção dos próximos 12 meses</h2>
+<div class="cv"><canvas id="c2"></canvas></div>
+<p id="projmsg" style="margin:10px 0 4px"></p>
+<p class="empty" style="margin:0;font-size:13px">Faixa vermelha = mês acima do teto de <span id="tt">70</span>% do salário. Considera só o que já está lançado: fixos, parcelas e avulsos.</p></section>
+<section class="card"><h2>Linha do tempo das parcelas</h2><div id="tl"></div></section>
+<section class="card"><h2>Análise do mês</h2><ul id="ins"></ul></section>
 <section class="card"><h2>E se eu comprar?</h2>
 <div class="fs">
 <div><label for="sv">Valor (R$)</label><input id="sv" inputmode="decimal" placeholder="Ex.: 2.400,00"></div>
@@ -54,13 +64,6 @@
 <div id="sr" style="margin-top:14px"></div>
 <div class="cv" style="margin-top:12px"><canvas id="c3"></canvas></div>
 </section>
-<div class="grid" style="margin-bottom:16px">
-<section class="card"><h2>Gastos por categoria</h2><div class="cv"><canvas id="c1"></canvas></div></section>
-<section class="card"><h2>Análise do mês</h2><ul id="ins"></ul></section>
-</div>
-<section class="card"><h2>Mês a mês: gastos × salário</h2>
-<div class="cv"><canvas id="c2"></canvas></div>
-<p class="empty" style="margin:8px 0 0">Barras: verde, amarelo ou vermelho conforme a saúde do mês. Linha tracejada: teto de <span id="tt">70</span>% do salário.</p></section>
 <section class="card"><h2>Relatório e exportação</h2><p class="empty" style="margin:-6px 0 12px">Resumo visual do mês (imagem ou PDF) e planilhas .csv que abrem no Excel e no Google Planilhas.</p>
 <div class="exp"><button id="xr">Relatório do mês</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
 </div>
@@ -133,6 +136,7 @@
 <script defer src="js/quick.js"></script>
 <script defer src="js/cartoes.js"></script>
 <script defer src="js/lista.js"></script>
+<script defer src="js/graficos.js"></script>
 <script defer src="js/relatorio.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>

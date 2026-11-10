@@ -25,6 +25,7 @@ js/lock.js        bloqueio por PIN
 js/cartoes.js     cartões e faturas
 js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
 js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
+js/graficos.js    categorias em barras, composição do mês e linha do tempo das parcelas
 js/version.js     versão do app (aumente a cada publicação)
 js/config.js      URL e chave do Supabase
 js/cloud.js       banco online (Supabase)
@@ -81,3 +82,10 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Lista (aba Gastos):** busca por nome, categoria ou pessoa; filtros por categoria, pessoa e situação (pendentes/pagos). Cada linha tem um menu **⋯** (editar, pagar, duplicar, excluir). Deslize a linha para a direita para marcar como pago e para a esquerda para excluir (sempre com Desfazer). **Selecionar** permite marcar vários como pagos, pendentes ou excluir de uma vez.
 - **Faturas:** cadastre cartões em Opções > Cartões (nome e dia do vencimento) ou direto em Novo gasto > Mais opções > Cartão. Em Gastos > Faturas, cada cartão mostra o total da fatura, a sua parte, a parte de outras pessoas e o aviso de vencimento. **Marcar minha parte como paga** marca todos os seus gastos daquele cartão no mês; os gastos de outras pessoas continuam controlados por reembolso.
 - **Relatório:** em Análises > Relatório e exportação. Imagem (PNG) e PDF do mês com nota, categorias, maiores gastos e comparação com o mês anterior. Planilhas .csv: do mês, completa (todos os meses) e resumo por mês.
+
+## Análises
+
+- **Composição do mês:** barra empilhada com fixos, parcelas, avulsos e o que sobra do salário, com a marca do teto. Gastos de outras pessoas aparecem à parte, fora do total.
+- **Gastos por categoria:** barras da maior para a menor, com ▲▼ contra o mês anterior. Tocar numa categoria abre a lista de gastos já filtrada (use "Limpar filtros" para voltar).
+- **Projeção dos próximos 12 meses:** barras de fixos, parcelas e avulsos já lançados, com salário e teto. Meses acima do teto ficam com faixa vermelha e entram no aviso abaixo do gráfico.
+- **Linha do tempo das parcelas:** cada parcelamento vira uma faixa até o mês em que termina, com avisos do tipo "Em Mar/27 terminam 2 parcelas e liberam R$ 385,00 por mês".

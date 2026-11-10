@@ -25,7 +25,7 @@ function render(){
   $('oth').innerHTML=ot.length?'<h2>Gastos de outras pessoas</h2><p class="empty" style="margin:-6px 0 6px;font-size:13px">Não entram nos seus totais. Marque como reembolsado quando a pessoa pagar.</p>'+Object.entries(by2).map(([n,o])=>'<div class="orow"><b>'+esc(n)+'</b><span>Total '+R(o.t)+'</span><span>Reembolsado '+R(o.p)+'</span><strong>A receber '+R(o.t-o.p)+'</strong></div>').join(''):'';
   $('pp').innerHTML=[...new Set(S.items.flatMap(i=>[i.who,...Object.values(i.ov||{}).map(o=>o.who)]).filter(Boolean))].map(n=>'<option value="'+esc(n)+'">').join('');
   renderList(all);
-  insights(h,rs);if(TAB==='an'){charts(h,rs);sim()}
+  insights(h,rs);if(TAB==='an'){charts(h,rs);renderAn(h,rs);sim()}
   if(typeof renderChips==='function')renderChips();
 }
 
