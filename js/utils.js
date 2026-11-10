@@ -1,7 +1,8 @@
 /* Utilitários: formatação, datas, mensagens */
 const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const $=id=>document.getElementById(id);
-const R=v=>v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
+let PRIV=false;try{PRIV=localStorage.getItem('fin_priv')==='1'}catch(e){}
+const R=v=>PRIV?'R$ ••••':v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const num=m=>{const[y,mo]=m.split('-').map(Number);return y*12+mo-1};
 const add=(m,n)=>{const t=num(m)+n;return Math.floor(t/12)+'-'+String(t%12+1).padStart(2,'0')};
 const lab=m=>MN[+m.slice(5)-1]+' '+m.slice(0,4);

@@ -1,4 +1,5 @@
 /* Tela principal: indicador de saúde, indicadores, lista do mês e análise */
+var TAB='in';
 function gaugeBg(){
   const t=Math.round(TETO*100),lo=t-20,hi=Math.min(t+15,95);
   return 'linear-gradient(90deg,var(--ok) 0 '+lo+'%,color-mix(in srgb,var(--ok) 55%,var(--wn)) '+lo+'% '+t+'%,var(--wn) '+t+'% '+hi+'%,var(--bd) '+hi+'% 100%)';
@@ -8,14 +9,16 @@ function render(){
   const h=health(cur),c='var(--'+(h.lv==='none'?'mu':h.lv)+')',all=rows(cur),rs=all.filter(r=>!r.who);
   const salVal=S.salary[cur]!==undefined?S.salary[cur]:sal(cur);
   $('hero').style.setProperty('--c',c);
-  $('hero').innerHTML='<div class="top"><div><p class="verdict">'+h.t+'</p><p>'+h.d+'</p>'+
-   '<div class="gauge" style="background:'+gaugeBg()+'"><i style="left:'+Math.min(h.p*100,100)+'%"></i></div><div class="scale" style="position:relative"><span>0%</span><span style="position:absolute;left:'+Math.round(TETO*100)+'%;transform:translateX(-50%)">teto '+Math.round(TETO*100)+'%</span><span>100%</span></div></div>'+
-   '<div><label for="sl">Salário em '+lab(cur)+'</label><input id="sl" inputmode="decimal" value="'+(salVal?String(salVal).replace('.',','):'')+'" placeholder="0,00"><p class="empty" style="margin:6px 0 0;font-size:13px">Vale também para os meses seguintes. Apague o campo para remover.</p></div></div>';
+  $('hero').innerHTML='<div><p class="verdict">'+h.t+'</p><p>'+h.d+'</p>'+
+   '<div class="gauge" style="background:'+gaugeBg()+'"><i style="left:'+Math.min(h.p*100,100)+'%"></i></div><div class="scale" style="position:relative"><span>0%</span><span style="position:absolute;left:'+Math.round(TETO*100)+'%;transform:translateX(-50%)">teto '+Math.round(TETO*100)+'%</span><span>100%</span></div></div>';
+  $('salbox').innerHTML='<label for="sl">Salário em '+lab(cur)+'</label><input id="sl" type="'+(PRIV?'password':'text')+'" inputmode="decimal" value="'+(salVal?String(salVal).replace('.',','):'')+'" placeholder="0,00"><p class="empty" style="margin:6px 0 0;font-size:13px">Vale também para os meses seguintes. Apague o campo para remover.</p>';
   $('sl').onchange=e=>{const v=parseFloat(e.target.value.replace(/\./g,'').replace(',','.'));if(e.target.value.trim()===''){withUndo('Salário removido',()=>{delete S.salary[cur]});return}if(isNaN(v)||v<0)return;S.salary[cur]=v;save();render()};
   const saldo=h.s-h.g;
   const pg=rs.filter(r=>S.paid[r.id+'|'+cur]).reduce((a,r)=>a+r.val,0),real=h.s-pg;
   const kp=[['Salário',R(h.s)],['Gastos',R(h.g)],['Saldo previsto',R(saldo),h.s?(saldo<0?'bd':'ok'):''],['Já pago',R(pg)],['Falta pagar',R(h.g-pg)],['Saldo real',R(real),h.s?(real<0?'bd':'ok'):'']];
-  $('kpis').innerHTML=kp.map(k=>'<div class="card"><small>'+k[0]+'</small><strong'+(k[2]?' style="color:var(--'+k[2]+')"':'')+'>'+k[1]+'</strong></div>').join('');
+  const kc=k=>'<div class="card"><small>'+k[0]+'</small><strong'+(k[2]?' style="color:var(--'+k[2]+')"':'')+'>'+k[1]+'</strong></div>';
+  $('k3').innerHTML=[kp[2],kp[4],kp[5]].map(kc).join('');
+  $('kpis').innerHTML=[kp[0],kp[1],kp[3]].map(kc).join('');
   const ot=all.filter(r=>r.who),by2={};
   ot.forEach(r=>{const o=by2[r.who]||(by2[r.who]={t:0,p:0});o.t+=r.val;if(S.paid[r.id+'|'+cur])o.p+=r.val});
   $('oth').hidden=!ot.length;
@@ -25,7 +28,8 @@ function render(){
   document.querySelectorAll('#list [data-id]').forEach(b=>b.onclick=()=>{removeItem(b.dataset.id)});
   document.querySelectorAll('#list [data-e]').forEach(b=>b.onclick=()=>openEd(b.dataset.e));
   document.querySelectorAll('#list [data-p]').forEach(b=>b.onchange=()=>{const k=b.dataset.p+'|'+cur;if(b.checked)S.paid[k]=true;else delete S.paid[k];save();render()});
-  insights(h,rs);charts(h,rs);sim();
+  insights(h,rs);if(TAB==='an'){charts(h,rs);sim()}
+  if(typeof renderChips==='function')renderChips();
 }
 
 function insights(h,rs){

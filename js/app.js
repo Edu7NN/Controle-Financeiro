@@ -1,12 +1,13 @@
 /* Inicialização */
+Lock.init();
 fillCats();
 $('st').value=cur;$('ss').value=cur;
 $('pv').onclick=()=>{cur=add(cur,-1);$('st').value=cur;$('ss').value=cur;render()};
 $('nx').onclick=()=>{cur=add(cur,1);$('st').value=cur;$('ss').value=cur;render()};
-$('cfgb').onclick=openCfg;$('bst').onclick=openCfg;$('cfgx').onclick=()=>$('cfg').close();
+$('bst').onclick=()=>showTab('op');
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
 Backup.init();Cloud.init();
-render();
+showTab('in');paintEye();
 $('ver').textContent=APP_VERSION;
 $('upd').onclick=async()=>{
   const b=$('upd');b.disabled=true;b.textContent='Atualizando...';
@@ -20,4 +21,4 @@ $('upd').onclick=async()=>{
 };
 if(sessionStorage.getItem('fin_upd')){sessionStorage.removeItem('fin_upd');toast('Versão atualizada: v'+APP_VERSION)}
 if('serviceWorker' in navigator&&location.protocol.indexOf('http')===0)navigator.serviceWorker.register('sw.js').catch(()=>{});
-$('fab').onclick=()=>{const n=$('nm');n.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>n.focus({preventScroll:true}),350)};
+$('fab').onclick=()=>openQ();

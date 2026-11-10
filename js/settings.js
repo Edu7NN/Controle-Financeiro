@@ -20,6 +20,18 @@ function addCat(n){
   n=n.trim();if(!n||CATS.includes(n))return openCfg();
   withUndo('Categoria adicionada',()=>{S.cats.push(n)});fillCats();openCfg();
 }
+const OPEN=new Set();
+/* Transforma cada título em uma seção recolhível (lembra quais estão abertas) */
+function foldCfg(){
+  [...$('cfgc').querySelectorAll(':scope>h2')].forEach(h=>{
+    const d=document.createElement('details'),s=document.createElement('summary'),sibs=[];
+    d.className='osec';s.textContent=h.textContent;
+    for(let n=h.nextSibling;n&&!(n.nodeType===1&&n.tagName==='H2');n=n.nextSibling)sibs.push(n);
+    h.replaceWith(d);d.append(s,...sibs);
+    d.open=OPEN.has(s.textContent);
+    d.ontoggle=()=>{d.open?OPEN.add(s.textContent):OPEN.delete(s.textContent)};
+  });
+}
 function openCfg(){
   const sk=Object.keys(S.salary).sort().reverse();
   $('cfgc').innerHTML=
@@ -28,10 +40,11 @@ function openCfg(){
    '<div class="cr"><input id="nc" placeholder="Nova categoria"><button id="anc">Adicionar</button></div>'+
    '<h2 style="margin-top:20px">Salários</h2>'+
    (sk.length?'<p class="empty" style="margin:0 0 8px">Cada valor vale a partir do mês indicado, até o próximo valor cadastrado.</p>'+
-    sk.map(k=>'<div class="cr s3"><span>'+lab(k)+'</span><input value="'+String(S.salary[k]).replace('.',',')+'" data-rs="'+k+'" inputmode="decimal" aria-label="Salário de '+lab(k)+'"><button class="s" data-ds="'+k+'" aria-label="Excluir salário de '+lab(k)+'">✕</button></div>').join('')
+    sk.map(k=>'<div class="cr s3"><span>'+lab(k)+'</span><input type="'+(PRIV?'password':'text')+'" value="'+String(S.salary[k]).replace('.',',')+'" data-rs="'+k+'" inputmode="decimal" aria-label="Salário de '+lab(k)+'"><button class="s" data-ds="'+k+'" aria-label="Excluir salário de '+lab(k)+'">✕</button></div>').join('')
     :'<p class="empty">Nenhum salário cadastrado.</p>')+
    '<h2 style="margin-top:20px">Teto saudável de gastos</h2><p class="empty" style="margin:0 0 8px">Percentual do salário que você aceita gastar no mês; o restante vai para reserva. Entre 50% e 95%.</p><div class="cr s3" style="grid-template-columns:120px auto 1fr"><input id="tp2" type="number" min="50" max="95" step="5" value="'+Math.round(TETO*100)+'" aria-label="Teto saudável em porcentagem"><span>% do salário</span></div>'+
-   '<h2 style="margin-top:20px">Banco online</h2>'+Cloud.section()+'<h2 style="margin-top:20px">Backup e restauração</h2>'+Backup.section();
+   '<h2 style="margin-top:20px">Privacidade e bloqueio</h2>'+Lock.section()+'<h2 style="margin-top:20px">Banco online</h2>'+Cloud.section()+'<h2 style="margin-top:20px">Backup e restauração</h2>'+Backup.section();
+  foldCfg();
   const q=s=>$('cfgc').querySelectorAll(s);
   q('[data-rc]').forEach(el=>el.onchange=()=>renameCat(CATS[+el.dataset.rc],el.value));
   q('[data-dc]').forEach(b=>b.onclick=()=>delCat(CATS[+b.dataset.dc]));
@@ -39,6 +52,5 @@ function openCfg(){
   $('tp2').onchange=e=>{const v=Math.round(pnum(e.target.value));if(isNaN(v)||v<50||v>95)return openCfg();withUndo('Teto alterado',()=>{S.teto=v;TETO=v/100});openCfg()};
   q('[data-rs]').forEach(el=>el.onchange=()=>{const v=pnum(el.value);if(isNaN(v)||v<0)return openCfg();S.salary[el.dataset.rs]=v;save();render();openCfg()});
   q('[data-ds]').forEach(b=>b.onclick=()=>{withUndo('Salário excluído',()=>{delete S.salary[b.dataset.ds]});openCfg()});
-  Cloud.bind($('cfgc'));Backup.bind($('cfgc'));
-  if(!$('cfg').open)$('cfg').showModal();
+  Lock.bind($('cfgc'));Cloud.bind($('cfgc'));Backup.bind($('cfgc'));
 }

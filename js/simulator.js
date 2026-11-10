@@ -23,7 +23,7 @@ function sim(){
   }
   if(n>1){const av=(tot(st)+total)/sal(st);L.push('À vista em '+lab(st)+': o mês iria a '+Math.round(av*100)+'% do salário'+(av<=TETO?', ainda dentro do teto.':', acima do teto.'));L.push('Se houver juros, o total pago passa do preço à vista: compare antes de parcelar.')}
   o.innerHTML='<p class="verdict" style="--c:var(--'+lv+');font-size:22px">'+title+'</p><p style="margin:0 0 4px">'+detail+'</p><p class="empty" style="padding:0 0 8px">Impacto: +'+R(val)+' por mês durante '+n+(n>1?' meses':' mês')+' (total '+R(total)+').</p><ul>'+L.map(x=>'<li>'+x+'</li>').join('')+'</ul><button class="s" id="sg" style="margin-top:8px">Levar para novo gasto</button>';
-  $('sg').onclick=()=>{$('vl').value=String(val).replace('.',',');$('np').value=n;$('tp').value='p';$('rc').value='u';rcSync();$('st').value=st;$('nm').focus();$('nm').scrollIntoView({behavior:'smooth',block:'center'})};
+  $('sg').onclick=()=>{openQ({vl:String(val).replace('.',','),np:n,tp:'p',st:st})};
   if(!window.Chart)return;
   const ms=Array.from({length:12},(_,i)=>add(cur,i)),mu=cssv('--mu'),ink=cssv('--ink'),ln=cssv('--ln');
   Chart.defaults.color=mu;Chart.defaults.font.family='Manrope,system-ui,sans-serif';
@@ -32,7 +32,7 @@ function sim(){
    {type:'bar',label:'Nova compra',data:ms.map(cost),backgroundColor:cssv('--ac'),stack:'g'},
    {type:'line',label:'Teto saudável ('+Math.round(TETO*100)+'%)',data:ms.map(m=>sal(m)*TETO),borderColor:cssv('--wn'),borderDash:[6,5],pointRadius:0,stack:'t'},
    {type:'line',label:'Salário',data:ms.map(sal),borderColor:ink,pointRadius:0,stack:'s'}]},
-   options:{maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:ln},ticks:{callback:v=>R(v).replace(',00','')}}},
+   options:{maintainAspectRatio:false,scales:{x:{stacked:true,grid:{display:false}},y:{stacked:true,beginAtZero:true,grid:{color:ln},ticks:{callback:v=>PRIV?'':R(v).replace(',00','')}}},
    plugins:{legend:{labels:{color:ink,boxWidth:12}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+R(c.raw)}}}}});
 }
 ['sv','sk','sn','ss'].forEach(id=>{$(id).oninput=sim;$(id).onchange=sim});

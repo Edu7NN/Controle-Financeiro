@@ -18,12 +18,12 @@ var Backup=(()=>{
   }
   function paint(){
     const e=$('bst');if(!e)return;let t,c;
-    if(meta.err){t='Falha no backup automático';c='bd'}
-    else if(!meta.last){t='Sem backup ainda';c='bd'}
+    if(meta.err){t='Falha no backup';c='bd'}
+    else if(!meta.last){t='Fazer backup';c='bd'}
     else{const d=Math.floor((Date.now()-new Date(meta.last))/864e5);
-      t='Backup '+(d<1?'hoje':d===1?'ontem':'há '+d+' dias')+(meta.dirty?' (há alterações novas)':'');
+      t='Backup '+(d<1?'hoje':d===1?'ontem':'há '+d+' dias')+(meta.dirty?' · pendente':'');
       c=(d>=7||(meta.dirty&&d>=3))?'wn':'ok'}
-    e.textContent=t;e.style.color='var(--'+c+')';e.style.borderColor='var(--'+c+')';
+    e.textContent=t;e.style.color='var(--'+c+')';e.style.borderColor='var(--'+c+')';e.hidden=(c==='ok');
   }
   function touch(){
     meta.dirty=true;store();paint();clearTimeout(timer);
@@ -59,7 +59,7 @@ var Backup=(()=>{
   function confirmRestore(o,from,box){
     const d=validate(o),n=d.items.length,s=Object.keys(d.salary).length;
     box.innerHTML='<p>Backup de <b>'+esc(from)+'</b>'+(o.exportedAt?' ('+new Date(o.exportedAt).toLocaleString('pt-BR')+')':'')+': '+n+' gastos e '+s+' salários. Restaurar substitui os dados atuais, e dá para desfazer logo depois.</p><button id="rok">Restaurar agora</button> <button class="s" id="rno">Cancelar</button>';
-    box.querySelector('#rok').onclick=()=>{withUndo('Backup restaurado',()=>applyState(JSON.parse(JSON.stringify(d))));$('cfg').close()};
+    box.querySelector('#rok').onclick=()=>{withUndo('Backup restaurado',()=>applyState(JSON.parse(JSON.stringify(d))));openCfg()};
     box.querySelector('#rno').onclick=()=>{box.innerHTML=''};
   }
   function section(){

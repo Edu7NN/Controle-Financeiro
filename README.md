@@ -19,6 +19,9 @@ js/simulator.js   simulador de compra
 js/backup.js      backup, restauração e envio ao GitHub
 js/settings.js    categorias e salários editáveis
 js/app.js         inicialização
+js/tabs.js        abas e botão de ocultar valores
+js/quick.js       novo gasto rápido, categoria automática e atalhos
+js/lock.js        bloqueio por PIN
 js/version.js     versão do app (aumente a cada publicação)
 js/config.js      URL e chave do Supabase
 js/cloud.js       banco online (Supabase)
@@ -60,3 +63,12 @@ No campo **De quem é o gasto?** informe o nome (vazio = seu). Esses gastos não
 ## Parcelas
 
 Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valor da parcela ou manter o total.
+
+## Abas, lançamento rápido e privacidade
+
+- **Abas:** Início (veredito, 3 números e atalhos), Gastos, Análises (simulador e gráficos) e Opções. O botão **+** no centro abre o novo gasto em qualquer aba.
+- **Novo gasto:** pede só nome e valor (Enter lança). Categoria, parcelas, recorrente, mês e "de quem é" ficam em **Mais opções**.
+- **Categoria automática:** aprende com o seu histórico e, sem histórico, usa palavras-chave (gasolina → Transporte). Se você escolher a categoria, ela não é trocada.
+- **Atalhos:** na tela Início, "↻ último gasto" e os gastos que mais se repetem lançam em um toque no mês exibido, com Desfazer.
+- **Ocultar valores:** o ícone de olho no topo troca todos os valores por R$ ••••; o estado fica salvo no aparelho.
+- **PIN:** em Opções > Privacidade e bloqueio. É uma barreira contra curiosos, não criptografia: não substitui a senha do celular.

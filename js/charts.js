@@ -14,6 +14,6 @@ function charts(h,rs){
    {type:'bar',label:'Gastos',data:ms.map(tot),backgroundColor:ms.map(m=>{const s=sal(m);return s?cl[level(tot(m)/s)]:mu}),borderRadius:4,order:2},
    {type:'line',label:'Salário',data:ms.map(sal),borderColor:ink,backgroundColor:ink,pointRadius:2,tension:0,order:1},
    {type:'line',label:'Teto saudável ('+Math.round(TETO*100)+'%)',data:ms.map(m=>sal(m)*TETO),borderColor:cl.wn,borderDash:[6,5],pointRadius:0,order:1}]},
-   options:{maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:ln},ticks:{callback:v=>R(v).replace(',00','')}}},
+   options:{maintainAspectRatio:false,scales:{x:{grid:{display:false}},y:{beginAtZero:true,grid:{color:ln},ticks:{callback:v=>PRIV?'':R(v).replace(',00','')}}},
    plugins:{legend:{labels:{color:ink,boxWidth:12}},tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+R(c.raw)}}}}});
 }

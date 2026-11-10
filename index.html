@@ -15,32 +15,25 @@
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body><main>
-<header><h1>Controle financeiro</h1>
-<div class="hb"><button class="pill" id="bst" style="background:transparent;cursor:pointer" aria-label="Abrir opções e backup"></button><button class="s" id="cfgb">Opções</button></div>
-<div class="nav"><button class="g" id="pv" aria-label="Mês anterior">‹</button><b id="ml"></b><button class="g" id="nx" aria-label="Próximo mês">›</button></div></header>
+<header>
+<div class="hrow"><h1>Controle financeiro</h1><div class="hb"><button class="pill" id="bst" hidden aria-label="Abrir opções e backup"></button><button id="eye" aria-label="Ocultar valores"></button></div></div>
+<div class="nav" id="mnav"><button class="g" id="pv" aria-label="Mês anterior">‹</button><b id="ml"></b><button class="g" id="nx" aria-label="Próximo mês">›</button></div>
+</header>
 
+<div class="pane" id="pane-in">
 <section class="card hero" id="hero"></section>
-<section class="kpis" id="kpis"></section>
+<div id="chipsw" hidden><small class="lbl">Lançar rápido</small><div class="chips" id="chips"></div></div>
+<section class="kpis k3" id="k3"></section>
 <section class="card" id="oth" hidden></section>
-
-<div class="grid" style="margin-bottom:16px">
-<section class="card"><h2>Novo gasto</h2>
-<div class="f">
-<div class="w"><label for="nm">Nome</label><input id="nm" placeholder="Ex.: Notebook, aluguel, mercado"></div>
-<div><label for="ct">Categoria</label><select id="ct"></select></div>
-<div><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal" placeholder="0,00"></div>
-<div class="w"><label for="rc">Tipo de gasto</label><select id="rc"><option value="u">Única ou parcelada</option><option value="r">Recorrente (todo mês)</option></select></div>
-<div><label for="np">Parcelas</label><input id="np" type="number" min="1" max="72" value="1"></div>
-<div><label for="tp">Valor informado</label><select id="tp"><option value="p">Por parcela</option><option value="t">Total da compra</option></select></div>
-<div class="w"><label for="st" id="stl">Primeira parcela em</label><input id="st" type="month"></div>
-<div class="w"><label for="wh">De quem é o gasto?</label><input id="wh" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"><p class="empty" style="margin:4px 0 0;font-size:13px">Gastos de outras pessoas não entram nos seus totais.</p></div>
-<div class="w"><button id="ad" style="width:100%">Adicionar gasto</button></div>
-</div>
-<p id="msg" class="empty" style="margin:8px 0 0" role="status"></p>
-</section>
-<section class="card"><h2>Gastos do mês</h2><div id="list"></div></section>
+<details class="card more"><summary>Detalhes e salário</summary>
+<div class="kpis" id="kpis"></div>
+<div id="salbox"></div>
+</details>
 </div>
 
+<div class="pane" id="pane-gs" hidden><section class="card"><h2>Gastos do mês</h2><div id="list"></div></section></div>
+
+<div class="pane" id="pane-an" hidden>
 <section class="card"><h2>E se eu comprar?</h2>
 <div class="fs">
 <div><label for="sv">Valor (R$)</label><input id="sv" inputmode="decimal" placeholder="Ex.: 2.400,00"></div>
@@ -58,9 +51,39 @@
 <section class="card"><h2>Mês a mês: gastos × salário</h2>
 <div class="cv"><canvas id="c2"></canvas></div>
 <p class="empty" style="margin:8px 0 0">Barras: verde, amarelo ou vermelho conforme a saúde do mês. Linha tracejada: teto de <span id="tt">70</span>% do salário.</p></section>
+</div>
+
+<div class="pane" id="pane-op" hidden>
+<section class="card"><div id="cfgc"></div></section>
 <footer class="ft"><span>v<span id="ver"></span></span><span id="cst"></span><button class="lnk" id="upd" title="Baixa a versão mais recente do site. Seus dados não são apagados.">Atualizar versão</button></footer>
-<datalist id="pp"></datalist>
+</div>
+<datalist id="pp"></datalist><datalist id="nms"></datalist>
 </main>
+
+<nav class="tabs" aria-label="Navegação">
+<button data-tab="in" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
+<button data-tab="gs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Gastos</span></button>
+<button class="plus" id="fab" aria-label="Novo gasto">+</button>
+<button data-tab="an"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg><span>Análises</span></button>
+<button data-tab="op"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Opções</span></button>
+</nav>
+
+<dialog id="qd"><div class="f">
+<div class="w"><h2>Novo gasto</h2></div>
+<div class="w"><label for="nm">Nome</label><input id="nm" list="nms" autocomplete="off" placeholder="Ex.: Gasolina, mercado, notebook"></div>
+<div class="w"><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal" placeholder="0,00"></div>
+<p class="empty w" id="cth" style="margin:0;font-size:13px"></p>
+<div class="w"><details id="mo"><summary>Mais opções</summary><div class="f" style="margin-top:10px">
+<div><label for="ct">Categoria</label><select id="ct"></select></div>
+<div><label for="rc">Tipo de gasto</label><select id="rc"><option value="u">Única ou parcelada</option><option value="r">Recorrente (todo mês)</option></select></div>
+<div><label for="np">Parcelas</label><input id="np" type="number" min="1" max="72" value="1"></div>
+<div><label for="tp">Valor informado</label><select id="tp"><option value="p">Por parcela</option><option value="t">Total da compra</option></select></div>
+<div class="w"><label for="st" id="stl">Primeira parcela em</label><input id="st" type="month"></div>
+<div class="w"><label for="wh">De quem é o gasto?</label><input id="wh" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"><p class="empty" style="margin:4px 0 0;font-size:13px">Gastos de outras pessoas não entram nos seus totais.</p></div>
+</div></details></div>
+<p id="msg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px"><button id="ad" style="flex:1">Adicionar</button><button class="s" id="qx">Cancelar</button></div>
+</div></dialog>
 <dialog id="dg"><div class="f">
 <div class="w"><h2 id="dt">Editar gasto</h2></div>
 <div class="w"><label for="en">Nome</label><input id="en"></div>
@@ -77,9 +100,8 @@
 <p id="em" class="empty w" role="status" style="margin:0"></p>
 <div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="es">Salvar</button><button class="s" id="ee">Encerrar recorrência</button><button class="s" id="ex">Cancelar</button></div>
 </div></dialog>
-<button class="fab" id="fab" aria-label="Novo gasto">+</button>
 <dialog id="cld"><div id="cldc"></div></dialog>
-<dialog id="cfg" class="wide"><div id="cfgc"></div><div style="text-align:right;margin-top:12px"><button class="s" id="cfgx">Fechar</button></div></dialog>
+<dialog id="lk"><div class="lkc"><img src="icons/icon-192.png" width="72" height="72" alt=""><h2>Controle financeiro</h2><p class="empty" style="margin:0">Digite seu PIN para abrir</p><input id="lkp" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"><p id="lke" role="alert" style="color:var(--bd);margin:0;min-height:1.5em"></p><button id="lkb">Entrar</button></div></dialog>
 <div id="toast" popover="manual" role="status"></div>
 <script defer src="js/version.js"></script>
 <script defer src="js/config.js"></script>
@@ -90,8 +112,11 @@
 <script defer src="js/ui.js"></script>
 <script defer src="js/expenses.js"></script>
 <script defer src="js/simulator.js"></script>
+<script defer src="js/quick.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>
+<script defer src="js/lock.js"></script>
 <script defer src="js/settings.js"></script>
+<script defer src="js/tabs.js"></script>
 <script defer src="js/app.js"></script>
 </body></html>

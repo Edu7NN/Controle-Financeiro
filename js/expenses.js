@@ -4,11 +4,13 @@ $('ad').onclick=()=>{
   if(!name||isNaN(v)||v<=0){m.textContent='Preencha o nome e um valor maior que zero.';return}
   const rec=$('rc').value==='r',nn=rec?1:n,who=$('wh').value.trim();
   const val=!rec&&$('tp').value==='t'?Math.round(v/nn*100)/100:v;
-  S.items.push({id:uid(),name,cat:$('ct').value,val,n:nn,start:st,...(rec?{rec:true}:{}),...(who?{who}:{})});save();
+  const snap=JSON.stringify(S);S.items.push({id:uid(),name,cat:$('ct').value,val,n:nn,start:st,...(rec?{rec:true}:{}),...(who?{who}:{})});save();
   m.textContent=rec?'Recorrente adicionado: '+R(val)+' por mês, a partir de '+lab(st)+'.':nn>1?'Adicionado: '+nn+' parcelas de '+R(val)+', de '+sh(st)+' até '+sh(add(st,nn-1))+'.':'Gasto adicionado em '+lab(st)+'.';
   if(who)m.textContent+=' Gasto de '+who+': não soma nos seus totais.';
   $('nm').value='';$('vl').value='';$('np').value=1;$('wh').value='';
   cur=st;render();
+  $('qd').close();
+  toast(m.textContent,()=>{applyState(JSON.parse(snap));save();render()});
 };
 const rcSync=()=>{const r=$('rc').value==='r';$('np').disabled=r;$('tp').disabled=r;$('stl').textContent=r?'Começa em':'Primeira parcela em'};
 $('rc').onchange=rcSync;
