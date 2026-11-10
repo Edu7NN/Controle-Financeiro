@@ -22,6 +22,9 @@ js/app.js         inicialização
 js/tabs.js        abas e botão de ocultar valores
 js/quick.js       novo gasto rápido, categoria automática e atalhos
 js/lock.js        bloqueio por PIN
+js/cartoes.js     cartões e faturas
+js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
+js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
 js/version.js     versão do app (aumente a cada publicação)
 js/config.js      URL e chave do Supabase
 js/cloud.js       banco online (Supabase)
@@ -72,3 +75,9 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Atalhos:** na tela Início, "↻ último gasto" e os gastos que mais se repetem lançam em um toque no mês exibido, com Desfazer.
 - **Ocultar valores:** o ícone de olho no topo troca todos os valores por R$ ••••; o estado fica salvo no aparelho.
 - **PIN:** em Opções > Privacidade e bloqueio. É uma barreira contra curiosos, não criptografia: não substitui a senha do celular.
+
+## Lista, faturas e relatório
+
+- **Lista (aba Gastos):** busca por nome, categoria ou pessoa; filtros por categoria, pessoa e situação (pendentes/pagos). Cada linha tem um menu **⋯** (editar, pagar, duplicar, excluir). Deslize a linha para a direita para marcar como pago e para a esquerda para excluir (sempre com Desfazer). **Selecionar** permite marcar vários como pagos, pendentes ou excluir de uma vez.
+- **Faturas:** cadastre cartões em Opções > Cartões (nome e dia do vencimento) ou direto em Novo gasto > Mais opções > Cartão. Em Gastos > Faturas, cada cartão mostra o total da fatura, a sua parte, a parte de outras pessoas e o aviso de vencimento. **Marcar minha parte como paga** marca todos os seus gastos daquele cartão no mês; os gastos de outras pessoas continuam controlados por reembolso.
+- **Relatório:** em Análises > Relatório e exportação. Imagem (PNG) e PDF do mês com nota, categorias, maiores gastos e comparação com o mês anterior. Planilhas .csv: do mês, completa (todos os meses) e resumo por mês.

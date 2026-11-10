@@ -7,6 +7,7 @@ function paintEye(){
 }
 function showTab(t){
   TAB=t;
+  if(t!=='gs'&&SELM){SELM=false;SEL.clear()}
   document.querySelectorAll('.pane').forEach(p=>p.hidden=p.id!=='pane-'+t);
   document.querySelectorAll('.tabs [data-tab]').forEach(b=>{const on=b.dataset.tab===t;b.classList.toggle('on',on);b.setAttribute('aria-current',on?'page':'false')});
   $('mnav').hidden=(t==='op');

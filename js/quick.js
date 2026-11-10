@@ -32,14 +32,14 @@ function hint(){
 function openQ(pre){
   pre=pre||{};ctManual=false;
   $('nm').value=pre.nm||'';$('vl').value=pre.vl||'';$('np').value=pre.np||1;$('rc').value='u';$('tp').value=pre.tp||'p';
-  rcSync();$('st').value=pre.st||cur;$('wh').value='';$('msg').textContent='';
+  rcSync();$('st').value=pre.st||cur;$('wh').value='';$('cd').value='';$('ncw').hidden=true;$('msg').textContent='';
   $('mo').open=!!((pre.np&&pre.np>1)||(pre.st&&pre.st!==cur));
   hint();$('qd').showModal();$('nm').focus();
 }
 function addCopy(src,start){
   if(!src)return;
   const snap=JSON.stringify(S);
-  S.items.push({id:uid(),name:src.name,cat:src.cat,val:src.val,n:src.n,start,...(src.rec?{rec:true}:{}),...(src.who?{who:src.who}:{})});
+  S.items.push({id:uid(),name:src.name,cat:src.cat,val:src.val,n:src.n,start,...(src.rec?{rec:true}:{}),...(src.who?{who:src.who}:{}),...(src.card?{card:src.card}:{})});
   save();render();
   toast('Adicionado: '+src.name+' '+R(src.val),()=>{applyState(JSON.parse(snap));save();render()});
 }

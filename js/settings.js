@@ -38,6 +38,7 @@ function openCfg(){
    '<h2>Categorias</h2><p class="empty" style="margin:0 0 8px">Renomeie ou exclua. Gastos de uma categoria excluída passam para “Outros”.</p>'+
    CATS.map((c,i)=>'<div class="cr"><input value="'+esc(c)+'" data-rc="'+i+'" aria-label="Renomear categoria '+esc(c)+'"><button class="s" data-dc="'+i+'" aria-label="Excluir categoria '+esc(c)+'">✕</button></div>').join('')+
    '<div class="cr"><input id="nc" placeholder="Nova categoria"><button id="anc">Adicionar</button></div>'+
+   '<h2 style="margin-top:20px">Cartões</h2>'+cardsHtml()+
    '<h2 style="margin-top:20px">Salários</h2>'+
    (sk.length?'<p class="empty" style="margin:0 0 8px">Cada valor vale a partir do mês indicado, até o próximo valor cadastrado.</p>'+
     sk.map(k=>'<div class="cr s3"><span>'+lab(k)+'</span><input type="'+(PRIV?'password':'text')+'" value="'+String(S.salary[k]).replace('.',',')+'" data-rs="'+k+'" inputmode="decimal" aria-label="Salário de '+lab(k)+'"><button class="s" data-ds="'+k+'" aria-label="Excluir salário de '+lab(k)+'">✕</button></div>').join('')
@@ -49,6 +50,7 @@ function openCfg(){
   q('[data-rc]').forEach(el=>el.onchange=()=>renameCat(CATS[+el.dataset.rc],el.value));
   q('[data-dc]').forEach(b=>b.onclick=()=>delCat(CATS[+b.dataset.dc]));
   $('anc').onclick=()=>addCat($('nc').value);
+  cardsBind();
   $('tp2').onchange=e=>{const v=Math.round(pnum(e.target.value));if(isNaN(v)||v<50||v>95)return openCfg();withUndo('Teto alterado',()=>{S.teto=v;TETO=v/100});openCfg()};
   q('[data-rs]').forEach(el=>el.onchange=()=>{const v=pnum(el.value);if(isNaN(v)||v<0)return openCfg();S.salary[el.dataset.rs]=v;save();render();openCfg()});
   q('[data-ds]').forEach(b=>b.onclick=()=>{withUndo('Salário excluído',()=>{delete S.salary[b.dataset.ds]});openCfg()});

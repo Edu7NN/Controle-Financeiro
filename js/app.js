@@ -1,6 +1,6 @@
 /* Inicialização */
 Lock.init();
-fillCats();
+fillCats();fillCards();
 $('st').value=cur;$('ss').value=cur;
 $('pv').onclick=()=>{cur=add(cur,-1);$('st').value=cur;$('ss').value=cur;render()};
 $('nx').onclick=()=>{cur=add(cur,1);$('st').value=cur;$('ss').value=cur;render()};

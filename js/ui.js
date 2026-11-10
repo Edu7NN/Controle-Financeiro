@@ -24,10 +24,7 @@ function render(){
   $('oth').hidden=!ot.length;
   $('oth').innerHTML=ot.length?'<h2>Gastos de outras pessoas</h2><p class="empty" style="margin:-6px 0 6px;font-size:13px">Não entram nos seus totais. Marque como reembolsado quando a pessoa pagar.</p>'+Object.entries(by2).map(([n,o])=>'<div class="orow"><b>'+esc(n)+'</b><span>Total '+R(o.t)+'</span><span>Reembolsado '+R(o.p)+'</span><strong>A receber '+R(o.t-o.p)+'</strong></div>').join(''):'';
   $('pp').innerHTML=[...new Set(S.items.flatMap(i=>[i.who,...Object.values(i.ov||{}).map(o=>o.who)]).filter(Boolean))].map(n=>'<option value="'+esc(n)+'">').join('');
-  $('list').innerHTML=all.length?all.sort((a,b)=>(a.who?1:0)-(b.who?1:0)||b.val-a.val).map(r=>'<div class="row'+(S.paid[r.id+'|'+cur]?' pd':'')+'"><input type="checkbox" class="ck" aria-label="'+(r.who?'Reembolsado: ':'Pago: ')+esc(r.name)+'" title="'+(r.who?'Marcar como reembolsado':'Marcar como pago')+'" data-p="'+r.id+'"'+(S.paid[r.id+'|'+cur]?' checked':'')+'><div class="nm"><b>'+esc(r.name)+'</b><small>'+esc(r.cat)+(r.who?' <span class="pill who">de '+esc(r.who)+'</span>':'')+(r.rec?' <span class="pill">↻ mensal</span>':r.n>1?' <span class="pill">parcela '+r.k+'/'+r.n+'</span>':'')+'</small></div><strong>'+R(r.val)+'</strong><div class="ac"><button title="Editar" aria-label="Editar '+esc(r.name)+'" data-e="'+r.id+'">✎</button><button title="'+(r.rec?'Excluir tudo, inclusive o histórico (para manter o histórico, use Editar e Encerrar recorrência)':r.n>1?'Excluir a compra inteira (todas as parcelas)':'Excluir')+'" aria-label="Excluir '+esc(r.name)+'" data-id="'+r.id+'">✕</button></div></div>').join(''):'<p class="empty">Nenhum gasto em '+lab(cur)+'. Use “Novo gasto” para adicionar o primeiro.</p>';
-  document.querySelectorAll('#list [data-id]').forEach(b=>b.onclick=()=>{removeItem(b.dataset.id)});
-  document.querySelectorAll('#list [data-e]').forEach(b=>b.onclick=()=>openEd(b.dataset.e));
-  document.querySelectorAll('#list [data-p]').forEach(b=>b.onchange=()=>{const k=b.dataset.p+'|'+cur;if(b.checked)S.paid[k]=true;else delete S.paid[k];save();render()});
+  renderList(all);
   insights(h,rs);if(TAB==='an'){charts(h,rs);sim()}
   if(typeof renderChips==='function')renderChips();
 }
