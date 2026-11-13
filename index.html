@@ -25,9 +25,10 @@
 <div id="chipsw" hidden><small class="lbl">Lançar rápido</small><div class="chips" id="chips"></div></div>
 <section class="kpis k3" id="k3"></section>
 <section class="card" id="oth" hidden></section>
-<details class="card more"><summary>Detalhes e salário</summary>
+<details class="card more"><summary>Detalhes e receitas</summary>
 <div class="kpis" id="kpis"></div>
 <div id="salbox"></div>
+<div id="incbox"></div>
 </details>
 </div>
 
@@ -48,10 +49,11 @@
 <section class="card"><h2>Composição do mês</h2><div id="comp"></div></section>
 <section class="card"><h2>Gastos por categoria</h2><div id="catbars"></div></section>
 </div>
+<section class="card"><h2>Ritmo do mês</h2><div id="pace"></div><div class="cv" id="pacecv"><canvas id="c4"></canvas></div><p id="pacenote" class="empty" style="margin:8px 0 0;font-size:13px"></p></section>
 <section class="card"><h2>Projeção dos próximos 12 meses</h2>
 <div class="cv"><canvas id="c2"></canvas></div>
 <p id="projmsg" style="margin:10px 0 4px"></p>
-<p class="empty" style="margin:0;font-size:13px">Faixa vermelha = mês acima do teto de <span id="tt">70</span>% do salário. Considera só o que já está lançado: fixos, parcelas e avulsos.</p></section>
+<p class="empty" style="margin:0;font-size:13px">Faixa vermelha = mês acima do teto de <span id="tt">70</span>% da receita. Considera só o que já está lançado: fixos, parcelas e avulsos.</p></section>
 <section class="card"><h2>Linha do tempo das parcelas</h2><div id="tl"></div></section>
 <section class="card"><h2>Análise do mês</h2><ul id="ins"></ul></section>
 <section class="card"><h2>E se eu comprar?</h2>
@@ -84,7 +86,7 @@
 </nav>
 
 <dialog id="qd"><div class="f">
-<div class="w"><h2>Novo gasto</h2></div>
+<div class="w lh"><h2>Novo gasto</h2><button type="button" class="s sm" id="qinc">+ Receita</button></div>
 <div class="w"><label for="nm">Nome</label><input id="nm" list="nms" autocomplete="off" placeholder="Ex.: Gasolina, mercado, notebook"></div>
 <div class="w"><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal" placeholder="0,00"></div>
 <p class="empty w" id="cth" style="margin:0;font-size:13px"></p>
@@ -94,6 +96,7 @@
 <div><label for="np">Parcelas</label><input id="np" type="number" min="1" max="72" value="1"></div>
 <div><label for="tp">Valor informado</label><select id="tp"><option value="p">Por parcela</option><option value="t">Total da compra</option></select></div>
 <div class="w"><label for="st" id="stl">Primeira parcela em</label><input id="st" type="month"></div>
+<div class="w"><label for="dy">Dia do mês (opcional)</label><input id="dy" type="number" min="1" max="31" inputmode="numeric" placeholder="Ex.: 10"><p class="empty" style="margin:4px 0 0;font-size:13px">Usado no ritmo do mês. Em parcelas e fixos, é o dia da cobrança.</p></div>
 <div class="w"><label for="cd">Cartão</label><select id="cd"></select></div>
 <div class="w" id="ncw" hidden><div class="cr" style="grid-template-columns:1fr 84px auto"><input id="ncn" placeholder="Nome do cartão" aria-label="Nome do cartão"><input id="ncd" type="number" min="1" max="31" placeholder="Venc." aria-label="Dia do vencimento"><button type="button" id="ncs">Salvar</button></div><p class="empty" style="margin:0;font-size:13px">Venc. = dia do vencimento da fatura (opcional).</p></div>
 <div class="w"><label for="wh">De quem é o gasto?</label><input id="wh" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"><p class="empty" style="margin:4px 0 0;font-size:13px">Gastos de outras pessoas não entram nos seus totais.</p></div>
@@ -109,6 +112,7 @@
 <div class="w" id="npw"><label for="enp">Número de parcelas</label><input id="enp" type="number" min="1" max="72"></div>
 <div class="w" id="npk" style="display:none"><label class="opt"><input type="radio" name="npm" value="p" checked> Manter o valor de cada parcela</label>
 <label class="opt"><input type="radio" name="npm" value="t"> Manter o total e recalcular a parcela</label></div>
+<div class="w"><label for="edy">Dia do mês (opcional)</label><input id="edy" type="number" min="1" max="31" inputmode="numeric"></div>
 <div class="w"><label for="ecd">Cartão</label><select id="ecd"></select></div>
 <div class="w"><label for="ew">De quem é o gasto?</label><input id="ew" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"></div>
 <div class="w" id="sc"><label>Aplicar a</label>
@@ -119,6 +123,17 @@
 <div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="es">Salvar</button><button class="s" id="ee">Encerrar recorrência</button><button class="s" id="ex">Cancelar</button></div>
 </div></dialog>
 <div id="selbar" hidden><span id="selc">0 selecionados</span><button id="sela">Todos</button><button id="selp">Pagar</button><button id="selu">Pendente</button><button id="seld">Excluir</button><button id="selx">Cancelar</button></div>
+<dialog id="idg"><div class="f">
+<div class="w"><h2 id="idt" style="margin-top:0">Nova receita</h2></div>
+<div class="w"><label for="inm">Nome</label><input id="inm" autocomplete="off" placeholder="Ex.: 13º salário (1ª parcela), freela do site"></div>
+<div><label for="ity">Tipo</label><select id="ity"></select></div>
+<div><label for="ival">Valor (R$)</label><input id="ival" inputmode="decimal" placeholder="0,00"></div>
+<div><label for="ist">Mês</label><input id="ist" type="month"></div>
+<div><label for="irc">Repete?</label><select id="irc"><option value="u">Só neste mês</option><option value="r">Todo mês</option></select></div>
+<div class="w" id="iew" hidden><label for="ien">Repete até (opcional)</label><input id="ien" type="month"></div>
+<p id="imsg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div>
+</div></dialog>
 <dialog id="rm" class="sheet"><h2 id="rmt" style="margin-top:0"></h2><div class="mlist"><button id="rm-edit">Editar</button><button id="rm-pay"></button><button id="rm-dup">Duplicar neste mês</button><button id="rm-del" class="s"></button><button id="rm-x" class="s">Fechar</button></div></dialog>
 <dialog id="rp" class="wide"><h2 style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
 <dialog id="cld"><div id="cldc"></div></dialog>
@@ -137,6 +152,8 @@
 <script defer src="js/cartoes.js"></script>
 <script defer src="js/lista.js"></script>
 <script defer src="js/graficos.js"></script>
+<script defer src="js/receitas.js"></script>
+<script defer src="js/ritmo.js"></script>
 <script defer src="js/relatorio.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>

@@ -235,3 +235,16 @@ dialog.sheet{margin:auto auto 0;width:100%;max-width:560px;border-radius:16px 16
 .tlb i{display:block;background:#3B7DD8;border-radius:6px}
 .tlb i.more{border-top-right-radius:0;border-bottom-right-radius:0;background:linear-gradient(90deg,#3B7DD8,#7FA9E6)}
 .tli small{color:var(--mu)}
+
+/* ===== Aviso compacto, receitas e ritmo ===== */
+#toast{inset:auto 0 calc(92px + env(safe-area-inset-bottom,0px)) 0;margin:0 auto;transform:none;width:max-content;max-width:calc(100% - 32px);background:#0A3B34;color:#EAF5F2;border:1px solid rgba(255,255,255,.14);padding:8px 8px 8px 16px;border-radius:999px;font-size:14px;box-shadow:0 6px 18px rgba(0,0,0,.35);overflow:hidden}
+#toast span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#toast button.s{min-height:32px;padding:2px 14px;font-size:13px;color:#EAF5F2;border-color:rgba(255,255,255,.35);border-radius:999px}
+#incbox{padding:0 16px 16px}
+.inc{display:flex;justify-content:space-between;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;color:var(--ink);border:0;border-bottom:1px solid var(--ln);border-radius:0;padding:10px 0;min-height:0;font-weight:400}
+.inc small{display:flex;gap:6px;margin-top:2px}
+.ic{grid-template-columns:1fr auto auto!important}
+.ic small.blk{display:block;color:var(--mu)}
+.icb{display:flex;gap:4px}.icb button{min-height:36px;min-width:38px;padding:4px 8px}
+.pace-sum{margin:0 0 8px;line-height:1.5}
+.pace-st{font-weight:700}.pace-st.up{color:var(--bd)}.pace-st.dn,.pace-st.ok{color:var(--ok)}

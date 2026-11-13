@@ -11,7 +11,7 @@ function reportData(m){
   rs.filter(r=>r.who).forEach(r=>{const o=oth[r.who]||(oth[r.who]={t:0,p:0});o.t+=r.val;if(S.paid[r.id+'|'+m])o.p+=r.val});
   const p=s?g/s:null;
   return{m,s,g,p,pm:tot(add(m,-1)),cats:Object.entries(by).sort((a,b)=>b[1]-a[1]),top:[...mine].sort((a,b)=>b.val-a.val).slice(0,5),oth,
-    nota:p===null?null:Math.max(0,Math.min(10,score(p))),parc:parc(m),fix:sumV(mine.filter(r=>r.rec)),paid:sumV(mine.filter(r=>S.paid[r.id+'|'+m]))};
+    nota:p===null?null:Math.max(0,Math.min(10,score(p))),extra:extraInc(m),parc:parc(m),fix:sumV(mine.filter(r=>r.rec)),paid:sumV(mine.filter(r=>S.paid[r.id+'|'+m]))};
 }
 function drawReport(m){
   const d=reportData(m),W=1080,cv=document.createElement('canvas');cv.width=W;cv.height=2400;
@@ -29,16 +29,17 @@ function drawReport(m){
     T(d.nota.toFixed(1).replace('.',','),930,162,62,'#FFFFFF',800,'center');T('Nota do mês',930,262,26,'#BFE3D9',600,'center');
   }
   let y=340;
-  [['Salário',d.s?Rf(d.s):'—',ink],['Gastos',Rf(d.g),ink],['Saldo previsto',d.s?Rf(d.s-d.g):'—',d.s&&d.s-d.g<0?bd:ok]].forEach((x,i)=>{
+  [['Receita',d.s?Rf(d.s):'—',ink],['Gastos',Rf(d.g),ink],['Saldo previsto',d.s?Rf(d.s-d.g):'—',d.s&&d.s-d.g<0?bd:ok]].forEach((x,i)=>{
     const bx=45+i*335;rr(bx,y,320,150,24,'#FFFFFF',ln);T(x[0],bx+28,y+52,26,mu,500);T(fit(x[1],270,40,800),bx+28,y+112,40,x[2],800);
   });
   y+=214;
-  T('Uso do salário',60,y,36,ink,800);y+=38;
+  if(d.extra>0){T(fit('Inclui '+Rf(d.extra)+' de outras receitas',960,26,500),60,y-26,26,mu,500);y+=22}
+  T('Uso da receita',60,y,36,ink,800);y+=38;
   if(d.p!==null){
     rr(60,y,960,30,15,'#D5DFDC');
     rr(60,y,Math.max(30,Math.min(d.p,1)*960),30,15,d.p<=TETO?ok:d.p<=Math.min(TETO+.15,.95)?wn:bd);
     c.fillStyle=ink;c.fillRect(60+TETO*960-2,y-8,4,46);
-    y+=84;T(Math.round(d.p*100)+'% do salário usado · teto de '+Math.round(TETO*100)+'%',60,y,30,ink,600);
+    y+=84;T(Math.round(d.p*100)+'% da receita usada · teto de '+Math.round(TETO*100)+'%',60,y,30,ink,600);
   }else{y+=40;T('Cadastre o salário para ver o percentual.',60,y,28,mu,500)}
   y+=50;
   if(d.pm>0){const df=d.g-d.pm;T(fit('Em relação a '+lab(add(m,-1))+': gastos '+(df>=0?'maiores':'menores')+' em '+Rf(Math.abs(df))+' ('+Math.round(Math.abs(df)/d.pm*100)+'%)',960,28,500),60,y,28,mu,500)}
@@ -110,10 +111,10 @@ $('rpp').onclick=()=>saveFile(pdfFromJpeg(RPC.toDataURL('image/jpeg',0.92),RPC.w
 /* planilhas (.csv, separador ; e acentos para o Excel em português) */
 const num2=v=>v.toFixed(2).replace('.',',');
 const csvCell=v=>{const s=String(v==null?'':v);return /[;"\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s};
-const HEAD=['Mês','Nome','Categoria','Valor','Parcela','Tipo','De quem','Cartão','Situação'];
+const HEAD=['Mês','Nome','Categoria','Valor','Parcela','Tipo','De quem','Cartão','Situação','Dia'];
 function csvRow(m,r){
   const p=!!S.paid[r.id+'|'+m];
-  return [m,r.name,r.cat,num2(r.val),r.rec?'mensal':r.n>1?r.k+'/'+r.n:'única',r.rec?'Recorrente':r.n>1?'Parcelado':'Único',r.who||'Eu',cardName(r.card)||'',r.who?(p?'Reembolsado':'A receber'):(p?'Pago':'Pendente')];
+  return [m,r.name,r.cat,num2(r.val),r.rec?'mensal':r.n>1?r.k+'/'+r.n:'única',r.rec?'Recorrente':r.n>1?'Parcelado':'Único',r.who||'Eu',cardName(r.card)||'',r.who?(p?'Reembolsado':'A receber'):(p?'Pago':'Pendente'),r.day||''];
 }
 function monthsRange(){
   const t=new Date(),now=t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0');
@@ -132,7 +133,7 @@ function detailLines(ms){
   return L;
 }
 function summaryLines(ms){
-  const L=[['Mês','Salário','Gastos (meus)','Saldo previsto','% do salário','Parcelas','Fixos','Já pago','Falta pagar','Nota']];
+  const L=[['Mês','Receita','Gastos (meus)','Saldo previsto','% da receita','Parcelas','Fixos','Já pago','Falta pagar','Nota']];
   ms.forEach(m=>{
     const d=reportData(m);
     L.push([m,num2(d.s),num2(d.g),num2(d.s-d.g),d.p===null?'':num2(d.p*100),num2(d.parc),num2(d.fix),num2(d.paid),num2(d.g-d.paid),d.nota===null?'':num2(d.nota)]);

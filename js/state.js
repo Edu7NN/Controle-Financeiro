@@ -12,7 +12,7 @@ const save=()=>{
   if(window.Cloud)Cloud.touch();
 };
 function applyState(next){
-  S=next;S.salary=S.salary||{};S.items=S.items||[];S.paid=S.paid||{};S.cards=S.cards||[];
+  S=next;S.salary=S.salary||{};S.items=S.items||[];S.paid=S.paid||{};S.cards=S.cards||[];S.incomes=S.incomes||[];
   S.cats=(S.cats&&S.cats.length)?S.cats:[...DEFAULT_CATS];CATS=S.cats;
   TETO=(S.teto>=50&&S.teto<=95?S.teto:70)/100;
   if(typeof fillCats==='function')fillCats();

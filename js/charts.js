@@ -3,7 +3,7 @@ function charts(h,rs){
   const ms=Array.from({length:12},(_,i)=>add(cur,i));
   const crit=ms.map(m=>sal(m)>0&&tot(m)>TETO*sal(m));
   const bad=ms.map((m,i)=>crit[i]?sh(m)+' ('+Math.round(tot(m)/sal(m)*100)+'%)':null).filter(Boolean);
-  $('projmsg').innerHTML=!ms.some(m=>sal(m)>0)?'Cadastre o salário para ver os meses críticos.':
+  $('projmsg').innerHTML=!ms.some(m=>sal(m)>0)?'Cadastre o salário ou uma receita para ver os meses críticos.':
     bad.length?'<span style="color:var(--bd)">⚠ Meses acima do teto: <b>'+bad.join(', ')+'</b></span>':
     '<span style="color:var(--ok)">Nenhum dos próximos 12 meses passa do teto com o que já está lançado.</span>';
   if(!window.Chart)return;
@@ -15,13 +15,13 @@ function charts(h,rs){
     {type:'bar',label:'Fixos',data:ms.map(m=>part(m,r=>r.rec)),backgroundColor:cssv('--ac'),stack:'g'},
     {type:'bar',label:'Parcelas',data:ms.map(m=>part(m,r=>!r.rec&&r.n>1)),backgroundColor:'#3B7DD8',stack:'g'},
     {type:'bar',label:'Avulsos já lançados',data:ms.map(m=>part(m,r=>!r.rec&&r.n===1)),backgroundColor:'#E0A526',stack:'g'},
-    {type:'line',label:'Salário',data:ms.map(sal),borderColor:ink,pointRadius:0,stack:'s'},
+    {type:'line',label:'Receita',data:ms.map(sal),borderColor:ink,pointRadius:0,stack:'s'},
     {type:'line',label:'Teto ('+Math.round(TETO*100)+'%)',data:ms.map(m=>sal(m)*TETO),borderColor:wn,borderDash:[6,5],pointRadius:0,stack:'t'}]},
     options:{maintainAspectRatio:false,
       scales:{x:{stacked:true,grid:{display:false},ticks:{autoSkip:false,maxRotation:0,color:c=>crit[c.index]?bd:mu,font:c=>({size:11,weight:crit[c.index]?'700':'400'})}},
               y:{stacked:true,beginAtZero:true,grid:{color:ln},ticks:{callback:v=>PRIV?'':R(v).replace(',00','')}}},
       plugins:{legend:{labels:{color:ink,boxWidth:12}},
-        tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+R(c.raw),footer:it=>{const m=ms[it[0].dataIndex],s=sal(m);return 'Total '+R(tot(m))+(s?' · '+Math.round(tot(m)/s*100)+'% do salário':'')}}}}},
+        tooltip:{callbacks:{label:c=>' '+c.dataset.label+': '+R(c.raw),footer:it=>{const m=ms[it[0].dataIndex],s=sal(m);return 'Total '+R(tot(m))+(s?' · '+Math.round(tot(m)/s*100)+'% da receita':'')}}}}},
     plugins:[{id:'crit',beforeDatasetsDraw(chart){
       const {ctx,chartArea:a,scales:{x}}=chart,w=x.getPixelForValue(1)-x.getPixelForValue(0);
       ctx.save();ctx.fillStyle='rgba(214,72,59,.16)';

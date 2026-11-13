@@ -12,12 +12,20 @@ const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',
 const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const pnum=s=>parseFloat(String(s).replace(/\./g,'').replace(',','.'));
 let toastT=null;
-function toast(msg,undo){
+/* Avisos curtos na parte de baixo: somem sozinhos (3 s; 5 s quando há "Desfazer") e ao toque */
+const TOAST_MS={plain:3000,undo:5000};
+function toast(msg,undo,ms){
   const t=$('toast');t.textContent='';
   const s=document.createElement('span');s.textContent=msg;t.append(s);
-  if(undo){const b=document.createElement('button');b.className='s';b.textContent='Desfazer';b.onclick=()=>{undo();hideToast()};t.append(b)}
+  if(undo){const b=document.createElement('button');b.className='s';b.textContent='Desfazer';b.onclick=e=>{e.stopPropagation();undo();hideToast()};t.append(b)}
+  t.onclick=hideToast;
   try{t.hidePopover()}catch(e){}
   try{t.showPopover()}catch(e){}
-  clearTimeout(toastT);toastT=setTimeout(hideToast,9000);
+  clearTimeout(toastT);toastT=setTimeout(hideToast,ms||(undo?TOAST_MS.undo:TOAST_MS.plain));
 }
 function hideToast(){try{$('toast').hidePopover()}catch(e){}}
+/* datas: chave de mês "AAAA-MM", mês de hoje e quantidade de dias do mês */
+const pad2=n=>String(n).padStart(2,'0');
+const monthKey=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1);
+const todayKey=()=>monthKey(new Date());
+const daysIn=m=>new Date(+m.slice(0,4),+m.slice(5),0).getDate();

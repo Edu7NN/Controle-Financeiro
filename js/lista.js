@@ -27,7 +27,7 @@ function rowHtml(r){
   const p=isPaid(r),on=SELM&&SEL.has(r.id);
   return '<div class="row'+(p?' pd':'')+(on?' sel':'')+'" data-id="'+r.id+'">'+
   '<input type="checkbox" class="ck" aria-label="'+(SELM?'Selecionar: ':r.who?'Reembolsado: ':'Pago: ')+esc(r.name)+'" title="'+(SELM?'Selecionar':r.who?'Marcar como reembolsado':'Marcar como pago')+'" data-p="'+r.id+'"'+((SELM?on:p)?' checked':'')+'>'+
-  '<div class="nm"><b>'+esc(r.name)+'</b><small>'+esc(r.cat)+(r.card&&cardById(r.card)?' <span class="pill">'+esc(cardName(r.card))+'</span>':'')+(r.who?' <span class="pill who">de '+esc(r.who)+'</span>':'')+(r.rec?' <span class="pill">↻ mensal</span>':r.n>1?' <span class="pill">parcela '+r.k+'/'+r.n+'</span>':'')+'</small></div>'+
+  '<div class="nm"><b>'+esc(r.name)+'</b><small>'+esc(r.cat)+(r.day?' · dia '+r.day:'')+(r.card&&cardById(r.card)?' <span class="pill">'+esc(cardName(r.card))+'</span>':'')+(r.who?' <span class="pill who">de '+esc(r.who)+'</span>':'')+(r.rec?' <span class="pill">↻ mensal</span>':r.n>1?' <span class="pill">parcela '+r.k+'/'+r.n+'</span>':'')+'</small></div>'+
   '<strong>'+R(r.val)+'</strong><div class="ac"><button class="mn" data-m="'+r.id+'" aria-label="Mais ações de '+esc(r.name)+'" aria-haspopup="dialog">⋯</button></div></div>';
 }
 function togglePaid(id){const k=id+'|'+cur;if(S.paid[k])delete S.paid[k];else S.paid[k]=true;save();render()}

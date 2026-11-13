@@ -26,6 +26,8 @@ js/cartoes.js     cartões e faturas
 js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
 js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
 js/graficos.js    categorias em barras, composição do mês e linha do tempo das parcelas
+js/receitas.js    receitas além do salário (13º, renda extra, bônus, outros)
+js/ritmo.js       ritmo do mês: gastos acumulados por dia x ritmo ideal
 js/version.js     versão do app (aumente a cada publicação)
 js/config.js      URL e chave do Supabase
 js/cloud.js       banco online (Supabase)
@@ -89,3 +91,10 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Gastos por categoria:** barras da maior para a menor, com ▲▼ contra o mês anterior. Tocar numa categoria abre a lista de gastos já filtrada (use "Limpar filtros" para voltar).
 - **Projeção dos próximos 12 meses:** barras de fixos, parcelas e avulsos já lançados, com salário e teto. Meses acima do teto ficam com faixa vermelha e entram no aviso abaixo do gráfico.
 - **Linha do tempo das parcelas:** cada parcelamento vira uma faixa até o mês em que termina, com avisos do tipo "Em Mar/27 terminam 2 parcelas e liberam R$ 385,00 por mês".
+
+## Receitas, dia do gasto e ritmo
+
+- **Outras receitas:** em Início > Detalhes e receitas (ou no botão **+ Receita** do novo gasto, ou em Opções > Outras receitas). Cada receita tem **nome**, **tipo** (13º salário, renda extra, bônus, outros), valor, mês e, se quiser, repete todo mês. Elas somam ao salário e formam a **receita do mês**, usada no indicador, no teto, nos gráficos, no simulador e no relatório.
+- **Dia do gasto (opcional):** em Novo gasto > Mais opções. Gastos do mês atual já vêm com o dia de hoje preenchido. Em parcelas e fixos é o dia da cobrança.
+- **Ritmo do mês (Análises):** linha acumulada dos gastos e dos pagos contra o ritmo ideal (o teto distribuído pelos dias do mês), com frases como "Você já gastou 62% do orçamento e estamos no dia 14 de 30". Gastos sem dia contam no total, mas não aparecem na linha.
+- **Avisos:** agora são compactos, somem em 3 s (5 s quando há Desfazer) e também ao toque.

@@ -1,6 +1,6 @@
 /* Análises: categorias em barras, composição do mês e linha do tempo das parcelas */
 const myRows=m=>rows(m).filter(r=>!r.who);
-function renderAn(h,rs){renderCats(rs);renderComp(h);renderTimeline()}
+function renderAn(h,rs){renderCats(rs);renderComp(h);renderRitmo();renderTimeline()}
 
 function renderCats(rs){
   const by={},pv={},prev=myRows(add(cur,-1));
@@ -30,8 +30,8 @@ function renderComp(h){
   const lg=(c,n,v)=>'<div class="lg"><span class="dot '+c+'"></span><span>'+n+'</span><b>'+R(v)+'</b><small>'+pct(v)+'</small></div>';
   $('comp').innerHTML='<div class="stk" role="img" aria-label="Composição do mês">'+seg(fx,'c-fx')+seg(pc,'c-pc')+seg(av,'c-av')+(s?seg(free,'c-fr'):'')+(s?'<b class="tetom" style="left:calc('+(TETO*s/base*100)+'% - 1px)" title="Teto"></b>':'')+'</div>'+
     lg('c-fx','Fixos (recorrentes)',fx)+lg('c-pc','Parcelas',pc)+lg('c-av','Avulsos',av)+
-    (s?(g>s?lg('c-bd','Acima do salário',g-s):lg('c-fr','Livre',free)):'')+
-    (g?'<p class="comp-note">Já travado em fixos e parcelas: <b>'+pct(fx+pc)+'</b>'+(s?' do salário':' dos gastos')+'.'+(s?(g>TETO*s?' O mês passa do teto de '+Math.round(TETO*100)+'%.':' Cabem mais '+R(TETO*s-g)+' até o teto de '+Math.round(TETO*100)+'%.'):'')+'</p>':'')+
+    (s?(g>s?lg('c-bd','Acima da receita',g-s):lg('c-fr','Livre',free)):'')+
+    (g?'<p class="comp-note">Já travado em fixos e parcelas: <b>'+pct(fx+pc)+'</b>'+(s?' da receita':' dos gastos')+'.'+(s?(g>TETO*s?' O mês passa do teto de '+Math.round(TETO*100)+'%.':' Cabem mais '+R(TETO*s-g)+' até o teto de '+Math.round(TETO*100)+'%.'):'')+'</p>':'')+
     (Object.keys(op).length?'<p class="comp-note">Fora do total (outras pessoas): '+Object.entries(op).map(([n,v])=>esc(n)+' '+R(v)).join(' · ')+'</p>':'');
 }
 
