@@ -91,7 +91,7 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Composição do mês:** barra empilhada com fixos, parcelas, avulsos e o que sobra do salário, com a marca do teto. Gastos de outras pessoas aparecem à parte, fora do total.
 - **Gastos por categoria:** barras da maior para a menor, com ▲▼ contra o mês anterior. Tocar numa categoria abre a lista de gastos já filtrada (use "Limpar filtros" para voltar).
 - **Projeção dos próximos 12 meses:** barras de fixos, parcelas e avulsos já lançados, com salário e teto. Meses acima do teto ficam com faixa vermelha e entram no aviso abaixo do gráfico.
-- **Linha do tempo das parcelas:** cada parcelamento vira uma faixa até o mês em que termina, com avisos do tipo "Em Mar/27 terminam 2 parcelas e liberam R$ 385,00 por mês".
+- **Linha do tempo das parcelas:** cada parcelamento vira uma barra de progresso (cheia = perto de terminar), com avisos do tipo "Em Mar/27 terminam 2 parcelas e liberam R$ 385,00 por mês".
 
 ## Receitas, dia do gasto e ritmo
 

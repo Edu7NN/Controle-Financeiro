@@ -260,3 +260,9 @@ details.more>.mgc{padding:0 16px 16px}
 .sub{padding:16px 0;border-top:1px solid var(--ln)}
 .sub:first-child{border-top:0;padding-top:4px}
 .sub>h2{font-size:16px;margin:0 0 12px}
+
+/* linha do tempo das parcelas: barra de progresso (cheia = perto de terminar) */
+.tlb{display:block}
+.tlb i{min-width:0;height:100%}
+.tlb i.near{background:var(--ok)}
+.tl-note{margin:0 0 6px;font-size:13px}

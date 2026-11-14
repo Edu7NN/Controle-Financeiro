@@ -39,7 +39,7 @@ function renderComp(win){
 }
 
 function renderTimeline(win){
-  const N=win.length,w0=win[0],last=win[N-1],box=$('tl'),cols='grid-template-columns:repeat('+N+',1fr)';
+  const N=win.length,w0=win[0],last=win[N-1],box=$('tl');
   const its=S.items.filter(i=>!i.rec&&i.n>1&&!i.who&&num(add(i.start,i.n-1))>=num(w0)&&num(i.start)<=num(last))
     .map(i=>({i,e:add(i.start,i.n-1)})).sort((a,b)=>num(a.e)-num(b.e)||b.i.val-a.i.val);
   if(!its.length){box.innerHTML='<p class="empty">Nenhuma parcela ativa neste período.</p>';return}
@@ -48,11 +48,12 @@ function renderTimeline(win){
     const nx=add(m,1),s=sal(nx),fol=s>0?TETO*s-tot(nx):null;
     return '<li>Em <b>'+sh(m)+'</b> terminam <b>'+rs.length+(rs.length===1?' parcela':' parcelas')+'</b> e liberam <b>'+R(sumV(rs))+'</b> por mês a partir de '+sh(nx)+(fol!==null?' · folga até o teto: '+R(Math.max(0,fol)):'')+'.</li>';
   }).join('')+'</ul>':'<p class="empty">Nenhuma parcela termina neste período.</p>';
-  const head='<div class="tlm" style="'+cols+'">'+win.map(m=>'<span>'+MN[+m.slice(5)-1].slice(0,3).toLowerCase()+'</span>').join('')+'</div>';
+  /* barra = quanto do parcelamento já foi cumprido (k/n): cheia = perto de terminar */
   const list=its.map(({i,e})=>{
-    const cr=rows(cur).find(x=>x.id===i.id),val=cr?cr.val:i.val,a=Math.max(0,num(i.start)-num(w0)),b=Math.min(N-1,num(e)-num(w0));
-    const beyond=num(e)>num(last),status=cr?'parcela '+cr.k+'/'+i.n:num(e)<num(cur)?'terminou em '+sh(e):'começa em '+sh(i.start);
-    return '<div class="tli"><div class="tlh"><b>'+esc(i.name)+'</b><span>'+R(val)+'/mês</span></div><div class="tlb" style="'+cols+'"><i class="'+(beyond?'more':'')+'" style="grid-column:'+(a+1)+'/'+(b+2)+'"></i></div><small>'+status+' · '+(num(e)<num(cur)?'':'termina em '+sh(e))+(beyond?' (depois do período)':'')+'</small></div>';
+    const cr=rows(cur).find(x=>x.id===i.id),val=cr?cr.val:i.val,ended=num(e)<num(cur),k=cr?cr.k:ended?i.n:0;
+    const pct=Math.round(k/i.n*100),left=i.n-k;
+    const status=ended?'terminou em '+sh(e):cr?'parcela '+k+'/'+i.n+' · '+(left?'faltam '+left:'última parcela')+' · termina em '+sh(e):'começa em '+sh(i.start)+' · termina em '+sh(e);
+    return '<div class="tli"><div class="tlh"><b>'+esc(i.name)+'</b><span>'+R(val)+'/mês</span></div><div class="tlb" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="'+pct+'" aria-label="Progresso de '+esc(i.name)+'"><i class="'+(pct>=75?'near':'')+'" style="width:'+pct+'%"></i></div><small>'+status+'</small></div>';
   }).join('');
-  box.innerHTML=msg+head+list;
+  box.innerHTML=msg+'<p class="empty tl-note">Barra cheia = parcelamento perto de terminar.</p>'+list;
 }
