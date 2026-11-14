@@ -25,6 +25,7 @@ js/lock.js        bloqueio por PIN
 js/cartoes.js     cartões e faturas
 js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
 js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
+js/periodo.js      período das análises (mês, 3, 6, 12 meses, ano) e destaques em frases
 js/graficos.js    categorias em barras, composição do mês e linha do tempo das parcelas
 js/receitas.js    receitas além do salário (13º, renda extra, bônus, outros)
 js/ritmo.js       ritmo do mês: gastos acumulados por dia x ritmo ideal
@@ -98,3 +99,10 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Dia do gasto (opcional):** em Novo gasto > Mais opções. Gastos do mês atual já vêm com o dia de hoje preenchido. Em parcelas e fixos é o dia da cobrança.
 - **Ritmo do mês (Análises):** linha acumulada dos gastos e dos pagos contra o ritmo ideal (o teto distribuído pelos dias do mês), com frases como "Você já gastou 62% do orçamento e estamos no dia 14 de 30". Gastos sem dia contam no total, mas não aparecem na linha.
 - **Avisos:** agora são compactos, somem em 3 s (5 s quando há Desfazer) e também ao toque.
+
+## Período, destaques e relatório do período
+
+- **Período (aba Análises):** Mês, 3, 6 ou 12 meses, ou Ano (janeiro a dezembro do ano exibido), contados a partir do mês exibido. Vale para composição, categorias, destaques, projeção, linha do tempo e relatório. O ritmo do mês continua sendo sempre do mês exibido. Em "Mês", a projeção e as parcelas mostram 12 meses.
+- **Destaques:** frases curtas como "Seu maior gasto foi X", "Gasolina subiu 20%", quanto gastou a mais ou a menos que o período anterior e o mês mais pesado.
+- **Ver mais:** os gráficos detalhados e as ferramentas (simulador e relatório) ficam recolhidos para a aba continuar leve; os gráficos só são desenhados quando a seção está aberta.
+- **Relatório:** o cartão do mês (imagem ou PDF) agora traz os destaques. Com um período selecionado, o botão **Resumo do período** gera o mesmo cartão para o intervalo, com o mês a mês e a comparação com o período anterior.

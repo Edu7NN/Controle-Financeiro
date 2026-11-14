@@ -24,7 +24,7 @@ function sim(){
   if(n>1){const av=(tot(st)+total)/sal(st);L.push('À vista em '+lab(st)+': o mês iria a '+Math.round(av*100)+'% da receita'+(av<=TETO?', ainda dentro do teto.':', acima do teto.'));L.push('Se houver juros, o total pago passa do preço à vista: compare antes de parcelar.')}
   o.innerHTML='<p class="verdict" style="--c:var(--'+lv+');font-size:22px">'+title+'</p><p style="margin:0 0 4px">'+detail+'</p><p class="empty" style="padding:0 0 8px">Impacto: +'+R(val)+' por mês durante '+n+(n>1?' meses':' mês')+' (total '+R(total)+').</p><ul>'+L.map(x=>'<li>'+x+'</li>').join('')+'</ul><button class="s" id="sg" style="margin-top:8px">Levar para novo gasto</button>';
   $('sg').onclick=()=>{openQ({vl:String(val).replace('.',','),np:n,tp:'p',st:st})};
-  if(!window.Chart)return;
+  if(!window.Chart||!$('mt').open)return;
   const ms=Array.from({length:12},(_,i)=>add(cur,i)),mu=cssv('--mu'),ink=cssv('--ink'),ln=cssv('--ln');
   Chart.defaults.color=mu;Chart.defaults.font.family='Manrope,system-ui,sans-serif';
   simCh=new Chart($('c3'),{data:{labels:ms.map(sh),datasets:[

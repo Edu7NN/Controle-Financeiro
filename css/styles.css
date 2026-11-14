@@ -248,3 +248,15 @@ dialog.sheet{margin:auto auto 0;width:100%;max-width:560px;border-radius:16px 16
 .icb{display:flex;gap:4px}.icb button{min-height:36px;min-width:38px;padding:4px 8px}
 .pace-sum{margin:0 0 8px;line-height:1.5}
 .pace-st{font-weight:700}.pace-st.up{color:var(--bd)}.pace-st.dn,.pace-st.ok{color:var(--ok)}
+
+/* ===== Período, destaques e seções recolhidas ===== */
+.pseg{grid-template-columns:repeat(5,minmax(0,1fr))}
+.pseg button{font-size:13px;padding:0 2px;min-height:38px}
+.hl{list-style:none;margin:0;padding:0}
+.hl li{padding:9px 0;border-top:1px solid var(--ln);line-height:1.45}
+.hl li:first-child{border-top:0;padding-top:0}
+.hl li:last-child{padding-bottom:0}
+details.more>.mgc{padding:0 16px 16px}
+.sub{padding:16px 0;border-top:1px solid var(--ln)}
+.sub:first-child{border-top:0;padding-top:4px}
+.sub>h2{font-size:16px;margin:0 0 12px}

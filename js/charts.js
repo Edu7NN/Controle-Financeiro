@@ -1,12 +1,13 @@
 /* Projeção dos próximos 12 meses (Chart.js): fixos, parcelas e avulsos já lançados, com meses acima do teto em destaque */
 function charts(h,rs){
-  const ms=Array.from({length:12},(_,i)=>add(cur,i));
+  const ms=forwardWin();
+  $('projt').textContent=PERIOD==='1'?'Projeção dos próximos 12 meses':PERIOD==='ano'?'Ano '+cur.slice(0,4)+', mês a mês':'Próximos '+PERIOD+' meses';
   const crit=ms.map(m=>sal(m)>0&&tot(m)>TETO*sal(m));
   const bad=ms.map((m,i)=>crit[i]?sh(m)+' ('+Math.round(tot(m)/sal(m)*100)+'%)':null).filter(Boolean);
   $('projmsg').innerHTML=!ms.some(m=>sal(m)>0)?'Cadastre o salário ou uma receita para ver os meses críticos.':
     bad.length?'<span style="color:var(--bd)">⚠ Meses acima do teto: <b>'+bad.join(', ')+'</b></span>':
-    '<span style="color:var(--ok)">Nenhum dos próximos 12 meses passa do teto com o que já está lançado.</span>';
-  if(!window.Chart)return;
+    '<span style="color:var(--ok)">Nenhum dos meses exibidos passa do teto com o que já está lançado.</span>';
+  if(!window.Chart||!$('mg').open)return;
   const ink=cssv('--ink'),mu=cssv('--mu'),ln=cssv('--ln'),bd=cssv('--bd'),wn=cssv('--wn');
   Chart.defaults.color=mu;Chart.defaults.font.family='Manrope,system-ui,sans-serif';
   Object.keys(ch).forEach(k=>{ch[k].destroy();delete ch[k]});

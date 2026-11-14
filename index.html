@@ -45,18 +45,22 @@
 </div>
 
 <div class="pane" id="pane-an" hidden>
-<div class="grid" style="margin-bottom:16px">
-<section class="card"><h2>Composição do mês</h2><div id="comp"></div></section>
-<section class="card"><h2>Gastos por categoria</h2><div id="catbars"></div></section>
-</div>
-<section class="card"><h2>Ritmo do mês</h2><div id="pace"></div><div class="cv" id="pacecv"><canvas id="c4"></canvas></div><p id="pacenote" class="empty" style="margin:8px 0 0;font-size:13px"></p></section>
-<section class="card"><h2>Projeção dos próximos 12 meses</h2>
+<div class="seg pseg" id="pseg" role="group" aria-label="Período"><button data-p="1">Mês</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button><button data-p="12">12 meses</button><button data-p="ano">Ano</button></div>
+<p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
+<section class="card"><h2>Destaques</h2><ul id="hl" class="hl"></ul></section>
+<section class="card"><h2 id="comp-t">Composição do mês</h2><div id="comp"></div></section>
+<details class="card more" id="mg"><summary>Ver mais gráficos</summary><div class="mgc">
+<section class="sub"><h2 id="cat-t">Gastos por categoria</h2><div id="catbars"></div></section>
+<section class="sub"><h2>Ritmo do mês</h2><div id="pace"></div><div class="cv" id="pacecv"><canvas id="c4"></canvas></div><p id="pacenote" class="empty" style="margin:8px 0 0;font-size:13px"></p></section>
+<section class="sub"><h2 id="projt">Projeção dos próximos 12 meses</h2>
 <div class="cv"><canvas id="c2"></canvas></div>
 <p id="projmsg" style="margin:10px 0 4px"></p>
 <p class="empty" style="margin:0;font-size:13px">Faixa vermelha = mês acima do teto de <span id="tt">70</span>% da receita. Considera só o que já está lançado: fixos, parcelas e avulsos.</p></section>
-<section class="card"><h2>Linha do tempo das parcelas</h2><div id="tl"></div></section>
-<section class="card"><h2>Análise do mês</h2><ul id="ins"></ul></section>
-<section class="card"><h2>E se eu comprar?</h2>
+<section class="sub"><h2>Linha do tempo das parcelas</h2><div id="tl"></div></section>
+<section class="sub"><h2>Análise do mês</h2><ul id="ins"></ul></section>
+</div></details>
+<details class="card more" id="mt"><summary>Simulador e relatório</summary><div class="mgc">
+<section class="sub"><h2>E se eu comprar?</h2>
 <div class="fs">
 <div><label for="sv">Valor (R$)</label><input id="sv" inputmode="decimal" placeholder="Ex.: 2.400,00"></div>
 <div><label for="sk">Valor informado</label><select id="sk"><option value="t">Total da compra</option><option value="p">Por parcela</option></select></div>
@@ -66,8 +70,9 @@
 <div id="sr" style="margin-top:14px"></div>
 <div class="cv" style="margin-top:12px"><canvas id="c3"></canvas></div>
 </section>
-<section class="card"><h2>Relatório e exportação</h2><p class="empty" style="margin:-6px 0 12px">Resumo visual do mês (imagem ou PDF) e planilhas .csv que abrem no Excel e no Google Planilhas.</p>
-<div class="exp"><button id="xr">Relatório do mês</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
+<section class="sub"><h2>Relatório e exportação</h2><p class="empty" style="margin:-6px 0 12px">Resumo visual do mês (imagem ou PDF) e planilhas .csv que abrem no Excel e no Google Planilhas.</p>
+<div class="exp"><button id="xr">Relatório do mês</button><button id="xp" hidden>Resumo do período</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
+</div></details>
 </div>
 
 <div class="pane" id="pane-op" hidden>
@@ -135,7 +140,7 @@
 <div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div>
 </div></dialog>
 <dialog id="rm" class="sheet"><h2 id="rmt" style="margin-top:0"></h2><div class="mlist"><button id="rm-edit">Editar</button><button id="rm-pay"></button><button id="rm-dup">Duplicar neste mês</button><button id="rm-del" class="s"></button><button id="rm-x" class="s">Fechar</button></div></dialog>
-<dialog id="rp" class="wide"><h2 style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
+<dialog id="rp" class="wide"><h2 id="rpt" style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
 <dialog id="cld"><div id="cldc"></div></dialog>
 <dialog id="lk"><div class="lkc"><img src="icons/icon-192.png" width="72" height="72" alt=""><h2>Controle financeiro</h2><p class="empty" style="margin:0">Digite seu PIN para abrir</p><input id="lkp" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"><p id="lke" role="alert" style="color:var(--bd);margin:0;min-height:1.5em"></p><button id="lkb">Entrar</button></div></dialog>
 <div id="toast" popover="manual" role="status"></div>
@@ -151,6 +156,7 @@
 <script defer src="js/quick.js"></script>
 <script defer src="js/cartoes.js"></script>
 <script defer src="js/lista.js"></script>
+<script defer src="js/periodo.js"></script>
 <script defer src="js/graficos.js"></script>
 <script defer src="js/receitas.js"></script>
 <script defer src="js/ritmo.js"></script>

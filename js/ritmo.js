@@ -35,7 +35,7 @@ function renderRitmo(){
   box.innerHTML='<p class="pace-sum">'+head+'</p><p class="pace-sum">Pago <b>'+R(d.paid)+'</b> · Pendente <b>'+R(d.total-d.paid)+'</b></p>';
   $('pacenote').textContent=(d.budget?'Orçamento = teto de '+Math.round(TETO*100)+'% da receita. ':'')+
     (d.undatedN?d.undatedN+(d.undatedN===1?' gasto sem dia ':' gastos sem dia ')+'('+R(d.undated)+') não aparece na linha: informe o dia em ✎.':'');
-  if(!window.Chart)return;
+  if(!window.Chart||!$('mg').open)return;
   const ink=cssv('--ink'),mu=cssv('--mu'),ln=cssv('--ln'),wn=cssv('--wn');
   Chart.defaults.color=mu;Chart.defaults.font.family='Manrope,system-ui,sans-serif';
   ch.p=new Chart($('c4'),{type:'line',data:{labels:Array.from({length:d.dim},(_,i)=>i+1),datasets:[
