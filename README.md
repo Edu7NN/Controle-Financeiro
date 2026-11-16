@@ -24,6 +24,8 @@ js/quick.js       novo gasto rápido, categoria automática e atalhos
 js/lock.js        bloqueio por PIN
 js/cartoes.js     cartões e faturas
 js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
+js/perfil.js       perfil financeiro e metas
+js/diagnostico.js  métricas, projeção realista e alertas calculados
 js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
 js/periodo.js      período das análises (mês, 3, 6, 12 meses, ano) e destaques em frases
 js/graficos.js    categorias em barras, composição do mês e linha do tempo das parcelas
@@ -106,3 +108,12 @@ Em ✎, altere o número de parcelas de uma compra e escolha entre manter o valo
 - **Destaques:** frases curtas como "Seu maior gasto foi X", "Gasolina subiu 20%", quanto gastou a mais ou a menos que o período anterior e o mês mais pesado.
 - **Ver mais:** os gráficos detalhados e as ferramentas (simulador e relatório) ficam recolhidos para a aba continuar leve; os gráficos só são desenhados quando a seção está aberta.
 - **Relatório:** o cartão do mês (imagem ou PDF) agora traz os destaques. Com um período selecionado, o botão **Resumo do período** gera o mesmo cartão para o intervalo, com o mês a mês e a comparação com o período anterior.
+
+## Perfil, metas e alertas (motor de diagnóstico)
+
+Tudo é calculado no aparelho, sem IA e sem enviar dados. Serve também de base para uma IA futura, que apenas explicaria estes fatos.
+
+- **Perfil (Opções > Perfil financeiro):** categorias essenciais, regras pessoais (parcelas até X% da receita, fixos + parcelas até Y%, reserva alvo em meses de custo essencial) e a reserva atual.
+- **Metas (Opções > Metas):** valor, quanto já guardou e prazo opcional. O sistema compara a necessidade mensal com a sua **sobra projetada** e diz se a meta é viável, apertada ou não cabe no prazo (com a data realista).
+- **Projeção realista:** meses futuros usam fixos + parcelas + a média dos seus gastos avulsos dos últimos 3 meses, para não projetar um mês "vazio".
+- **Painel de saúde e alertas (Análises):** gastos, parcelas, fixos + parcelas, poupança e reserva, cada um com semáforo; alertas ordenados por gravidade e impacto em reais (meses acima do teto, reserva, metas, dinheiro de outras pessoas, faturas a vencer, ritmo, categoria fora do padrão, parcelas que terminam e liberam dinheiro). "Ocultar neste mês" silencia um alerta até o mês virar. Na tela Início aparecem no máximo 2 alertas importantes.

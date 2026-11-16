@@ -28,6 +28,7 @@ function render(){
   insights(h,rs);if(TAB==='an'){charts(h,rs);renderAn(h,rs);sim()}
   if(typeof renderChips==='function')renderChips();
   if(typeof renderInc==='function')renderInc();
+  if(typeof renderDiag==='function')renderDiag();
 }
 
 function insights(h,rs){

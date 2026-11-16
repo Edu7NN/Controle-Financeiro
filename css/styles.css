@@ -266,3 +266,27 @@ details.more>.mgc{padding:0 16px 16px}
 .tlb i{min-width:0;height:100%}
 .tlb i.near{background:var(--ok)}
 .tl-note{margin:0 0 6px;font-size:13px}
+
+/* ===== Perfil, metas, painel de saúde e alertas ===== */
+.attn{display:grid;gap:8px;margin-bottom:14px}
+.at{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:var(--sf);color:var(--ink);border:1px solid var(--ln);border-left:5px solid var(--wn);border-radius:12px;padding:10px 12px;min-height:0;font-weight:600;font-size:14px}
+.at.bad{border-left-color:var(--bd)}
+.at span{flex:1}.at i{font-style:normal;color:var(--mu);font-size:18px}
+.pr{display:grid;grid-template-columns:14px 1fr auto;gap:2px 10px;align-items:center;padding:9px 0;border-top:1px solid var(--ln)}
+.pr:first-child{border-top:0;padding-top:0}
+.pr small{grid-column:2/4;color:var(--mu)}
+.dot.lv-ok{background:var(--ok)}.dot.lv-warn{background:var(--wn)}.dot.lv-bad{background:var(--bd)}.dot.lv-none{background:var(--ln)}
+.al{padding:12px 0;border-top:1px solid var(--ln)}
+.al:first-child{border-top:0;padding-top:0}
+.alh{display:flex;gap:8px;align-items:center}.alh b{flex:1}
+.alb{width:10px;height:10px;border-radius:50%;flex:none;background:#3B7DD8}
+.lv-bad .alb{background:var(--bd)}.lv-warn .alb{background:var(--wn)}
+.al p{margin:6px 0 8px;color:var(--mu);line-height:1.5}
+.ala{display:flex;gap:8px;flex-wrap:wrap}
+.alr-more summary{cursor:pointer;color:var(--ac);font-weight:600;padding:10px 0 0}
+.chkg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:6px}
+.chk{display:flex;gap:8px;align-items:center;color:var(--ink);font-size:14px;margin:0;padding:6px 8px;border:1px solid var(--ln);border-radius:8px}
+.chk input{width:18px;height:18px;min-height:0;padding:0;accent-color:var(--ac)}
+.gl{padding:12px 0;border-top:1px solid var(--ln)}
+.glh{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}.glh span{color:var(--mu);text-align:right}
+.gl small{color:var(--mu);display:block;margin-top:4px}

@@ -22,6 +22,7 @@
 
 <div class="pane" id="pane-in">
 <section class="card hero" id="hero"></section>
+<div id="attn" class="attn" hidden></div>
 <div id="chipsw" hidden><small class="lbl">Lançar rápido</small><div class="chips" id="chips"></div></div>
 <section class="kpis k3" id="k3"></section>
 <section class="card" id="oth" hidden></section>
@@ -47,6 +48,8 @@
 <div class="pane" id="pane-an" hidden>
 <div class="seg pseg" id="pseg" role="group" aria-label="Período"><button data-p="1">Mês</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button><button data-p="12">12 meses</button><button data-p="ano">Ano</button></div>
 <p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
+<section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
+<section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
 <section class="card"><h2>Destaques</h2><ul id="hl" class="hl"></ul></section>
 <section class="card"><h2 id="comp-t">Composição do mês</h2><div id="comp"></div></section>
 <details class="card more" id="mg"><summary>Ver mais gráficos</summary><div class="mgc">
@@ -139,6 +142,15 @@
 <p id="imsg" class="empty w" role="status" style="margin:0"></p>
 <div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div>
 </div></dialog>
+<dialog id="gdg"><div class="f">
+<div class="w"><h2 id="gdt" style="margin-top:0">Nova meta</h2></div>
+<div class="w"><label for="gnm">Nome</label><input id="gnm" autocomplete="off" placeholder="Ex.: Viagem, entrada do carro"></div>
+<div><label for="gtg">Valor da meta (R$)</label><input id="gtg" inputmode="decimal" placeholder="0,00"></div>
+<div><label for="gsv">Já guardado (R$)</label><input id="gsv" inputmode="decimal" placeholder="0,00"></div>
+<div class="w"><label for="gdl">Prazo (opcional)</label><input id="gdl" type="month"></div>
+<p id="gmsg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="gsave">Salvar</button><button class="s" id="gcancel">Cancelar</button><button class="s" id="gdel" hidden>Excluir</button></div>
+</div></dialog>
 <dialog id="rm" class="sheet"><h2 id="rmt" style="margin-top:0"></h2><div class="mlist"><button id="rm-edit">Editar</button><button id="rm-pay"></button><button id="rm-dup">Duplicar neste mês</button><button id="rm-del" class="s"></button><button id="rm-x" class="s">Fechar</button></div></dialog>
 <dialog id="rp" class="wide"><h2 id="rpt" style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
 <dialog id="cld"><div id="cldc"></div></dialog>
@@ -160,6 +172,8 @@
 <script defer src="js/graficos.js"></script>
 <script defer src="js/receitas.js"></script>
 <script defer src="js/ritmo.js"></script>
+<script defer src="js/perfil.js"></script>
+<script defer src="js/diagnostico.js"></script>
 <script defer src="js/relatorio.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>
