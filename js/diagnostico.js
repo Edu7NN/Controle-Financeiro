@@ -158,27 +158,66 @@ function diagnose(){
     old.forEach(m=>myRows(m).forEach(q=>{if(!S.paid[q.id+'|'+m]){n++;v+=q.val;if(!first)first=m}}));
     if(n>0)push('info','pend','Há '+n+' lançamentos antigos sem marcação de pago','Marque os que você já pagou (somam '+R(v)+') para o saldo real ficar fiel.',v,{label:'Ver pendentes',run:()=>{cur=first;F.q='';F.cat='';F.who='';F.st='p';VIEW='l';showTab('gs')}});
   }
-  return out.sort((a,b)=>LV_W[a.lv]-LV_W[b.lv]||b.imp-a.imp);
+  /* onde cortar: liga o que falta (metas, reserva, mês crítico) aos gastos flexíveis e de desejo */
+  const a6=avgCapacity(6),shorts=[];
+  if(sumNeed>a6)shorts.push({n:sumNeed-a6,why:'as metas caberem'});
+  if(P.focus==='reserva'&&P.reserve&&ri.gap>0&&ri.gap/12>a6)shorts.push({n:ri.gap/12-a6,why:'completar a reserva em 12 meses'});
+  if(crit.length)shorts.push({n:projSpend(crit[0])-TETO*sal(crit[0]),why:'voltar ao teto em '+sh(crit[0])});
+  const worst=shorts.sort((a,b)=>b.n-a.n)[0];
+  if(worst&&worst.n>0){
+    const cs=cutSuggestion(worst.n),top3=cs.list.slice(0,3);
+    push('warn','corte','Onde cortar para '+worst.why,
+      'Faltam '+R(worst.n)+' por mês. '+(top3.length?'O corte mais indolor, segundo o seu perfil: '+top3.map(z=>esc(z.c)+' −'+Math.round(z.pct*100)+'% ('+R(z.save)+')').join(', ')+'. Somam '+R(cs.total)+'. '+(cs.covers?'Isso fecha a conta.':'Só cortar não fecha: reveja prazo ou valor, ou aumente a receita.'):'Você não tem gastos flexíveis ou de desejo para cortar. Reveja prazo ou valor, ou aumente a receita.'),
+      worst.n,top3.length?{label:'Ver '+esc(top3[0].c),run:()=>{F.q='';F.who='';F.st='';F.cat=top3[0].c;VIEW='l';showTab('gs')}}:null);
+  }
+  /* o foco escolhido no perfil leva os alertas relacionados ao topo, dentro do mesmo nível de gravidade */
+  const boost={reserva:k=>k==='reserva'||k==='corte',parcelas:k=>['parc','trav','frag','libera'].includes(k),metas:k=>k.startsWith('meta')||k==='corte'}[P.focus]||(()=>false);
+  const tier=a=>boost(a.k)?0:1;
+  return out.sort((a,b)=>LV_W[a.lv]-LV_W[b.lv]||tier(a)-tier(b)||b.imp-a.imp);
 }
 
-const muted=a=>(prof().mute[a.k]||'')===todayKey();
+const muted=a=>hiddenByDecision(a.k);
 function alertHtml(a,i){
   return '<div class="al lv-'+a.lv+'"><div class="alh"><span class="alb"></span><b>'+a.t+'</b></div><p>'+a.x+'</p><div class="ala">'+
-    (a.act?'<button class="s sm" data-act="'+i+'">'+a.act.label+'</button>':'')+'<button class="s sm" data-mute="'+esc(a.k)+'">Ocultar neste mês</button></div></div>';
+    (a.act?'<button class="s sm" data-act="'+i+'">'+a.act.label+'</button>':'')+
+    '<select class="dsel" data-dec="'+i+'" aria-label="Marcar este alerta"><option value="">Marcar…</option><option value="done">Já fiz</option><option value="snooze">Adiar 14 dias</option><option value="never">Não serve para mim</option></select></div></div>';
 }
 function goAlert(a){
   if(a.act.run)return a.act.run();
   showTab(a.act.go);
 }
 function renderDiag(){
-  ALERTS=diagnose().filter(a=>!muted(a));
+  const P=prof();
+  ALERTS=diagnose().filter(a=>!muted(a)).map(a=>{const d=decisionOf(a.k);return d&&d.kind==='done'?{...a,x:a.x+' Você marcou “Já fiz” em '+brDate(d.at)+', mas a situação continua.'}:a});
   const top=ALERTS.filter(a=>a.lv==='bad'||a.lv==='warn').slice(0,2);
-  $('attn').hidden=!top.length;
-  $('attn').innerHTML=top.map(a=>'<button class="at '+a.lv+'" data-at="1"><span>'+a.t+'</span><i>›</i></button>').join('');
+  const showOb=!P.onboarded&&S.items.length>0&&P.obSkip!==todayKey();
+  $('attn').hidden=!(top.length||showOb);
+  $('attn').innerHTML=(showOb?'<button class="at info" data-ob="1"><span>Complete o seu perfil em 1 minuto</span><i>›</i></button>':'')+top.map(a=>'<button class="at '+a.lv+'" data-at="1"><span>'+a.t+'</span><i>›</i></button>').join('');
+  $('attn').querySelectorAll('[data-ob]').forEach(b=>b.onclick=openOnb);
   $('attn').querySelectorAll('[data-at]').forEach(b=>b.onclick=()=>{showTab('an');const e=$('alr-card');if(e&&e.scrollIntoView)try{e.scrollIntoView()}catch(x){}});
   $('pnl').innerHTML=panel().map(p=>'<div class="pr"><span class="dot lv-'+p.lv+'"></span><span>'+p.label+'</span><b>'+p.val+'</b><small>'+p.rule+'</small></div>').join('');
   const L=ALERTS,first=L.slice(0,4),rest=L.slice(4);
   $('alr').innerHTML=L.length?first.map((a,i)=>alertHtml(a,i)).join('')+(rest.length?'<details class="alr-more"><summary>Ver mais '+rest.length+(rest.length===1?' alerta':' alertas')+'</summary>'+rest.map((a,i)=>alertHtml(a,i+4)).join('')+'</details>':''):'<p class="empty">Nenhum alerta: você está dentro das suas regras.</p>';
   $('alr').querySelectorAll('[data-act]').forEach(b=>b.onclick=()=>goAlert(ALERTS[+b.dataset.act]));
-  $('alr').querySelectorAll('[data-mute]').forEach(b=>b.onclick=()=>editProfile(pf=>{pf.mute={...(pf.mute||{}),[b.dataset.mute]:todayKey()}}));
+  $('alr').querySelectorAll('[data-dec]').forEach(sl=>sl.onchange=()=>{if(sl.value)decide(ALERTS[+sl.dataset.dec],sl.value)});
+  renderCuts();
+}
+
+/* ---------- cortes sugeridos pelo peso das categorias ---------- */
+const CUT_RATE={D:.30,F:.15};
+/** Categorias flexíveis e de desejo com a economia mensal estimada (média dos meses recentes, sem parcelas). */
+function cutSuggestion(need){
+  const ms=recentMonths(),base=ms.length?ms:[cur],by={},P=prof();
+  base.forEach(m=>myRows(m).filter(r=>r.rec||r.n===1).forEach(r=>by[r.cat]=(by[r.cat]||0)+r.val));
+  const list=Object.entries(by).map(([c,v])=>({c,lvl:P.levels[c]||'F',avg:v/base.length})).filter(z=>z.lvl!=='E'&&z.avg>0)
+    .map(z=>({...z,pct:CUT_RATE[z.lvl],save:z.avg*CUT_RATE[z.lvl]})).sort((a,b)=>b.save-a.save);
+  const total=list.reduce((a,z)=>a+z.save,0);
+  return{list,total,covers:total>=(need||0)};
+}
+function renderCuts(){
+  const cs=cutSuggestion(0);
+  $('cuts').innerHTML=cs.list.length?cs.list.slice(0,5).map(z=>'<button class="cb" data-cut="'+esc(z.c)+'"><span class="cn">'+esc(z.c)+'</span><em class="vr new">'+LEVELS[z.lvl]+' · −'+Math.round(z.pct*100)+'%</em><span class="cv2">'+R(z.save)+'</span><span class="cbar"><i style="width:'+Math.max(4,z.avg/cs.list[0].avg*100)+'%;background:'+(COL[CATS.indexOf(z.c)%COL.length]||'#5B7370')+'"></i></span></button>').join('')+
+    '<p class="empty" style="margin:10px 0 0;font-size:13px">Aplicando os cortes sugeridos (desejo −30%, flexível −15%) você libera cerca de <b>'+R(cs.total)+'</b> por mês. Médias dos últimos meses, sem contar parcelas.</p>'
+    :'<p class="empty">Sem gastos flexíveis ou de desejo para sugerir cortes. Ajuste o peso das categorias em Opções > Perfil financeiro.</p>';
+  $('cuts').querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>{F.q='';F.who='';F.st='';F.cat=b.dataset.cut;VIEW='l';showTab('gs')});
 }

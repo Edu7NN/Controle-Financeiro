@@ -290,3 +290,9 @@ details.more>.mgc{padding:0 16px 16px}
 .gl{padding:12px 0;border-top:1px solid var(--ln)}
 .glh{display:flex;justify-content:space-between;gap:10px;margin-bottom:6px}.glh span{color:var(--mu);text-align:right}
 .gl small{color:var(--mu);display:block;margin-top:4px}
+
+/* ===== Camada 2: perfil, decisões e cortes ===== */
+.at.info{border-left-color:#3B7DD8}
+.lv{display:grid;grid-template-columns:1fr 130px;gap:6px 10px;align-items:center;margin-top:6px}
+.lv select{min-height:38px;padding:4px 8px;font-size:14px}
+.dsel{min-height:34px;padding:2px 8px;font-size:13px;width:auto;max-width:100%}

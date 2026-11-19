@@ -25,6 +25,7 @@ js/lock.js        bloqueio por PIN
 js/cartoes.js     cartões e faturas
 js/lista.js       lista: busca, filtros, seleção em lote, menu ⋯ e gestos
 js/perfil.js       perfil financeiro e metas
+js/decisoes.js     memória do que você fez, adiou ou descartou
 js/diagnostico.js  métricas, projeção realista e alertas calculados
 js/relatorio.js   relatório (imagem/PDF) e planilhas .csv
 js/periodo.js      período das análises (mês, 3, 6, 12 meses, ano) e destaques em frases
@@ -117,3 +118,9 @@ Tudo é calculado no aparelho, sem IA e sem enviar dados. Serve também de base 
 - **Metas (Opções > Metas):** valor, quanto já guardou e prazo opcional. O sistema compara a necessidade mensal com a sua **sobra projetada** e diz se a meta é viável, apertada ou não cabe no prazo (com a data realista).
 - **Projeção realista:** meses futuros usam fixos + parcelas + a média dos seus gastos avulsos dos últimos 3 meses, para não projetar um mês "vazio".
 - **Painel de saúde e alertas (Análises):** gastos, parcelas, fixos + parcelas, poupança e reserva, cada um com semáforo; alertas ordenados por gravidade e impacto em reais (meses acima do teto, reserva, metas, dinheiro de outras pessoas, faturas a vencer, ritmo, categoria fora do padrão, parcelas que terminam e liberam dinheiro). "Ocultar neste mês" silencia um alerta até o mês virar. Na tela Início aparecem no máximo 2 alertas importantes.
+
+## Camada 2: perfil e memória de decisões
+
+- **Perfil:** renda fixa ou variável (muda a reserva sugerida: 6 ou 9 meses), foco atual (equilibrar, montar reserva, reduzir parcelas ou juntar para metas) e o **peso de cada categoria**: Essencial, Flexível ou Desejo. O foco escolhido leva os alertas relacionados ao topo, dentro do mesmo nível de gravidade. Uma pergunta rápida ("Conhecendo você") aparece na tela Início até o perfil ser respondido.
+- **Onde ajustar primeiro:** com o peso das categorias, o sistema estima quanto cada uma pode render de corte (desejo −30%, flexível −15%, sem contar parcelas) e liga isso ao que falta: meta que não cabe, reserva em 12 meses ou mês acima do teto.
+- **Decisões:** em cada alerta use "Marcar…": **Já fiz** (some por 45 dias e volta com aviso se a situação continuar), **Adiar 14 dias** ou **Não serve para mim** (nunca mais). Em Opções > Decisões dá para reativar. `decisionSummary()` entrega perfil, regras e decisões em um objeto, que será a base de contexto de uma IA futura, para ela não repetir o que você descartou.

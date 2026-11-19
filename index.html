@@ -50,6 +50,7 @@
 <p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
 <section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
 <section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
+<section class="card"><h2>Onde ajustar primeiro</h2><div id="cuts"></div></section>
 <section class="card"><h2>Destaques</h2><ul id="hl" class="hl"></ul></section>
 <section class="card"><h2 id="comp-t">Composição do mês</h2><div id="comp"></div></section>
 <details class="card more" id="mg"><summary>Ver mais gráficos</summary><div class="mgc">
@@ -142,6 +143,13 @@
 <p id="imsg" class="empty w" role="status" style="margin:0"></p>
 <div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div>
 </div></dialog>
+<dialog id="ob"><div class="f">
+<div class="w"><h2 style="margin-top:0">Conhecendo você</h2><p class="empty" style="margin:0">Três respostas deixam os alertas e as metas mais certeiros. Leva 1 minuto e dá para mudar depois em Opções > Perfil financeiro.</p></div>
+<div><label for="oi">Sua renda é</label><select id="oi"></select></div>
+<div><label for="of">Seu foco agora</label><select id="of"></select></div>
+<div class="w"><label for="orv">Quanto você já tem de reserva? (R$)</label><input id="orv" inputmode="decimal" placeholder="0,00"></div>
+<div class="w" style="display:flex;gap:8px"><button id="osv">Salvar</button><button class="s" id="odp">Depois</button></div>
+</div></dialog>
 <dialog id="gdg"><div class="f">
 <div class="w"><h2 id="gdt" style="margin-top:0">Nova meta</h2></div>
 <div class="w"><label for="gnm">Nome</label><input id="gnm" autocomplete="off" placeholder="Ex.: Viagem, entrada do carro"></div>
@@ -173,6 +181,7 @@
 <script defer src="js/receitas.js"></script>
 <script defer src="js/ritmo.js"></script>
 <script defer src="js/perfil.js"></script>
+<script defer src="js/decisoes.js"></script>
 <script defer src="js/diagnostico.js"></script>
 <script defer src="js/relatorio.js"></script>
 <script defer src="js/backup.js"></script>
