@@ -51,10 +51,20 @@
 <p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
 <section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
 <section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
+
 <section class="card" id="ia-card">
-  <div class="lh"><h2>Leitura do mês (IA)</h2><button class="s sm" id="ia-gen">Gerar</button></div>
-  <div id="ia-out"><p class="empty" style="margin:0">Sob demanda: a IA lê os fatos já calculados e devolve até 3 prioridades ordenadas por impacto em reais. Nada é enviado até você clicar.</p></div>
+  <div class="lh" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+    <h2 style="margin: 0;">Leitura do mês (IA)</h2>
+    <div style="display: flex; gap: 8px;">
+      <button class="s sm" id="ia-toggle" style="display: none;">Ocultar</button>
+      <button class="s sm" id="ia-gen">Gerar</button>
+    </div>
+  </div>
+  <div id="ia-out" style="margin-top: 12px;">
+    <p class="empty" style="margin:0; font-size: 13px;">Sob demanda: a IA lê os fatos já calculados e devolve até 3 prioridades ordenadas por impacto em reais. Nada é enviado até você clicar.</p>
+  </div>
 </section>
+
 <section class="card" id="ia-chat-card">
   <div class="lh"><h2>Pergunte ao seu dinheiro</h2><button class="s sm" id="ia-open">Abrir conversa</button></div>
   <p class="empty" style="margin:0">Ex.: "posso comprar um celular de R$ 2.400 em 10x?" — a IA usa o simulador que você já tem e comenta o resultado.</p>
