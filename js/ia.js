@@ -47,14 +47,27 @@
     return out;
   };
 
-  IA.runSimulator = async function (args) {
+    IA.runSimulator = async function (args) {
     // Tenta achar a função do seu simulador em vários lugares comuns
     const fn = window.simularCompra || window.simulate || window.Simulator?.run || window.simulador;
+    
     if (typeof fn === "function") {
-      try { return await fn(args); } catch (e) { return { erro: String(e) }; }
+      try { 
+        const res = await fn(args); 
+        return res;
+      } catch (e) { 
+        console.error("Erro no simulador:", e);
+        return { erro: "O simulador deu erro interno: " + String(e) }; 
+      }
     }
-    return { indisponivel: true, mensagem: "Simulador não encontrado. Peça ao usuário para abrir Análises > Simulador." };
+    
+    console.warn("IA.runSimulator: Função não encontrada. window.simularCompra existe?", typeof window.simularCompra);
+    return { indisponivel: true, mensagem: "Simulador não encontrado. O app precisa ser atualizado." };
   };
+  // ---------------------------------------------------------------
+
+  IA.ativo    = () => localStorage.getItem("ia.ativo") !== "0";
+  IA.setAtivo = (v) => localStorage.setItem("ia.ativo", v ? "1" : "0");
   // ---------------------------------------------------------------
 
   IA.ativo    = () => localStorage.getItem("ia.ativo") !== "0";
