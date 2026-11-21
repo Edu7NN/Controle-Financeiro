@@ -1,0 +1,38 @@
+/* Estilos exclusivos da camada de IA (leitura do mês + chat). */
+
+.ia-msgs {
+  max-height: 50vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px 2px;
+}
+.ia-msgs .b {
+  padding: 8px 10px;
+  border-radius: 10px;
+  max-width: 92%;
+  white-space: pre-wrap;
+  font-size: 14px;
+  line-height: 1.35;
+}
+.ia-msgs .u { align-self: flex-end;   background: #0A3B34; color: #fff; }
+.ia-msgs .a { align-self: flex-start; background: var(--ln, #eef2f1); color: inherit; }
+.ia-msgs .s { align-self: center; font-size: 12px; color: #777; background: transparent; }
+
+.ia-pri {
+  border: 1px solid var(--ln, #dde);
+  border-radius: 10px;
+  padding: 10px;
+  margin-top: 8px;
+}
+.ia-pri h3 { margin: 0 0 4px; font-size: 15px; }
+.ia-pri .imp { font-weight: 700; }
+.ia-pri .meta { font-size: 12px; color: #666; margin-top: 4px; }
+.ia-pri button { margin-top: 8px; }
+
+@media (prefers-color-scheme: dark) {
+  .ia-msgs .a { background: #1c2a27; color: #e6ecea; }
+  .ia-pri { border-color: #2a3a36; }
+  .ia-pri .meta { color: #9fb0ac; }
+}
