@@ -438,7 +438,3 @@ window.simularCompra = function(args) {
     return { erro: String(e) };
   }
 };
-    console.warn("Erro ao montar fatos para IA:", e);
-    return { erro: "Falha ao ler dados locais" };
-  }
-};
