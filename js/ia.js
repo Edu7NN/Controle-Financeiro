@@ -93,9 +93,12 @@
   body: JSON.stringify(payload),
 });
      
-    const data = await r.json().catch(() => ({}));
+       const data = await r.json().catch(() => ({}));
     if (r.status === 429) throw new Error("Limite diário de IA atingido. Volte amanhã.");
-    if (!r.ok) throw new Error(data.error || ("Falha " + r.status));
+    if (!r.ok) {
+      const detalhe = data.detail ? `OpenAI: ${data.detail}` : (data.error || ("Falha " + r.status));
+      throw new Error(detalhe);
+    }
     return data;
   };
 
