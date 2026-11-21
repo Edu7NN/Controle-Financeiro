@@ -47,7 +47,7 @@
     return out;
   };
 
-    IA.runSimulator = async function (args) {
+  IA.runSimulator = async function (args) {
     // Tenta achar a função do seu simulador em vários lugares comuns
     const fn = window.simularCompra || window.simulate || window.Simulator?.run || window.simulador;
     
@@ -64,10 +64,6 @@
     console.warn("IA.runSimulator: Função não encontrada. window.simularCompra existe?", typeof window.simularCompra);
     return { indisponivel: true, mensagem: "Simulador não encontrado. O app precisa ser atualizado." };
   };
-  // ---------------------------------------------------------------
-
-  IA.ativo    = () => localStorage.getItem("ia.ativo") !== "0";
-  IA.setAtivo = (v) => localStorage.setItem("ia.ativo", v ? "1" : "0");
   // ---------------------------------------------------------------
 
   IA.ativo    = () => localStorage.getItem("ia.ativo") !== "0";
@@ -100,14 +96,16 @@
     if (!token) throw new Error("Entre no banco online (Opções > Banco online) para usar a IA.");
     if (!navigator.onLine) throw new Error("Sem internet. A IA só funciona conectada.");
     
-   const r = await fetch(url + "/functions/v1/ia", {
-  method: "POST",
-  headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
-  body: JSON.stringify(payload),
-});
-     
-       const data = await r.json().catch(() => ({}));
+    const r = await fetch(url + "/functions/v1/ia", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    
+    const data = await r.json().catch(() => ({}));
+    
     if (r.status === 429) throw new Error("Limite diário de IA atingido. Volte amanhã.");
+    
     if (!r.ok) {
       const detalhe = data.detail ? `OpenAI: ${data.detail}` : (data.error || ("Falha " + r.status));
       throw new Error(detalhe);
@@ -120,7 +118,6 @@
     const out = $("#ia-out"); if (!out) return;
     if (!IA.ativo()) { out.innerHTML = '<p class="empty">IA desligada em Opções.</p>'; return; }
     
-    // Tenta descobrir o mês atual (se o seu app tiver uma função global)
     let mes = new Date().toISOString().slice(0, 7);
     try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
     
@@ -201,44 +198,74 @@
     if (!IA.ativo()) return alert("IA desligada em Opções.");
     IA.facts = pseudonimizar(IA.buildFacts());
     IA.hist = [];
-    const msgs = $("#ia-msgs"); if (msgs) msgs.innerHTML = "";
-    $("#ia-dlg")?.showModal();
+    
+    const msgs = $("#ia-msgs"); 
+    if (msgs) {
+      msgs.innerHTML = `<div class="ia-msg a">Olá! Eu sou o assistente do seu Controle Financeiro. Já li os seus alertas e dados deste mês. Como posso ajudar?</div>`;
+    }
+    
+    const dlg = $("#ia-dlg");
+    if (dlg) {
+      dlg.showModal();
+      setTimeout(() => { const inp = $("#ia-in"); if(inp) inp.focus(); }, 100);
+    }
   };
 
   IA.enviarChat = async function (texto) {
     texto = String(texto || "").trim();
     if (!texto) return;
     const msgs = $("#ia-msgs"); if (!msgs) return;
+    
     const add = (role, txt) => {
       const b = document.createElement("div");
-      b.className = "b " + (role === "user" ? "u" : role === "assistant" ? "a" : "s");
-      b.textContent = txt; msgs.appendChild(b); msgs.scrollTop = msgs.scrollHeight;
+      b.className = "ia-msg " + (role === "user" ? "u" : role === "assistant" ? "a" : "s");
+      b.textContent = txt; 
+      msgs.appendChild(b); 
+      msgs.scrollTop = msgs.scrollHeight;
+      return b;
     };
+    
     add("user", texto);
     IA.hist.push({ role: "user", content: texto });
+    
     const input = $("#ia-in");   if (input) input.value = "";
     const btn   = $("#ia-send"); if (btn) btn.disabled = true;
+
+    // Adiciona o indicador de digitando
+    const typing = document.createElement("div");
+    typing.className = "typing-indicator";
+    typing.innerHTML = "<span></span><span></span><span></span>";
+    msgs.appendChild(typing);
+    msgs.scrollTop = msgs.scrollHeight;
     
     try {
       for (let i = 0; i < 5; i++) {
         const res = await IA.call({ mode: "chat", facts: IA.facts, messages: IA.hist });
+        
         if (res.needs_tool) {
           IA.hist.push(res.assistant_message);
           const result = await IA.runSimulator(res.needs_tool.args);
           IA.hist.push({ role: "tool", tool_call_id: res.needs_tool.tool_call_id, content: JSON.stringify(result) });
           continue;
         }
+        
         if (res.reply) {
+          typing.remove(); // Remove o "digitando"
           IA.hist.push({ role: "assistant", content: res.reply });
           add("assistant", res.reply);
           return;
         }
         break;
       }
+      typing.remove();
       add("s", "Não consegui completar. Tente de novo.");
     } catch (e) {
-      add("s", e.message);
-    } finally { if (btn) btn.disabled = false; }
+      typing.remove();
+      add("s", "Erro: " + e.message);
+    } finally { 
+      if (btn) btn.disabled = false; 
+      if (input) input.focus();
+    }
   };
 
   // -------- Ligação com a UI --------
