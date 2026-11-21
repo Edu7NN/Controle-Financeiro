@@ -87,12 +87,12 @@
     if (!token) throw new Error("Entre no banco online (Opções > Banco online) para usar a IA.");
     if (!navigator.onLine) throw new Error("Sem internet. A IA só funciona conectada.");
     
-    const r = await fetch(url + "/functions/v1/ai", {
-      method: "POST",
-      headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-    
+   const r = await fetch(url + "/functions/v1/ia", {
+  method: "POST",
+  headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
+  body: JSON.stringify(payload),
+});
+     
     const data = await r.json().catch(() => ({}));
     if (r.status === 429) throw new Error("Limite diário de IA atingido. Volte amanhã.");
     if (!r.ok) throw new Error(data.error || ("Falha " + r.status));
