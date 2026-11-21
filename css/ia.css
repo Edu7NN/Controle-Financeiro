@@ -2,7 +2,7 @@
    CHAT DA IA - BLINDADO E RESPONSIVO (MOBILE E DESKTOP)
    ========================================================= */
 
-/* 1. O Container Principal (Tela Cheia no Celular) */
+/* 1. O Container Principal */
 #ia-dlg {
   padding: 0 !important;
   border: none !important;
@@ -25,19 +25,19 @@
   flex-direction: column !important;
   background: var(--bg, #0d1b1a) !important;
   width: 100% !important;
-  height: 100dvh !important; /* Ocupa toda a altura no celular */
+  height: 100dvh !important;
   box-sizing: border-box !important;
 }
 
 /* 2. Layout de Computador (Modal Centralizado) */
 @media (min-width: 600px) {
   #ia-dlg {
-    max-width: 500px !important;
-    max-height: 85vh !important;
-    height: 85vh !important;
+    max-width: 480px !important;
+    max-height: 80vh !important;
+    height: 80vh !important;
     margin: auto !important;
     border-radius: 16px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important;
     border: 1px solid var(--ln, #2a3a36) !important;
   }
   #ia-dlg .ia-chat-wrapper {
@@ -46,20 +46,27 @@
   }
 }
 
-/* 3. Cabeçalho */
+/* 3. Cabeçalho (Forçando lado a lado) */
 #ia-dlg .ia-header {
   display: flex !important;
   flex-direction: row !important;
   justify-content: space-between !important;
   align-items: center !important;
-  padding: 16px !important;
+  padding: 16px 20px !important;
   background: var(--card, #12201e) !important;
   border-bottom: 1px solid var(--ln, #2a3a36) !important;
   flex-shrink: 0 !important;
+  margin: 0 !important;
+}
+
+#ia-dlg .ia-header > div {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
 }
 
 #ia-dlg .ia-header h2 {
-  margin: 0 0 4px 0 !important;
+  margin: 0 0 2px 0 !important;
   font-size: 18px !important;
   font-weight: 700 !important;
   color: var(--ink, #fff) !important;
@@ -70,44 +77,49 @@
   font-size: 12px !important;
   color: #4ade80 !important;
   display: block !important;
+  line-height: 1 !important;
 }
 
+/* Força o botão Fechar a ficar pequeno e no canto */
 #ia-dlg .ia-header button.ia-close {
   width: auto !important;
   min-width: 70px !important;
   margin: 0 !important;
-  padding: 8px 12px !important;
+  padding: 8px 16px !important;
   background: transparent !important;
   border: 1px solid var(--ln, #2a3a36) !important;
   color: var(--ink, #fff) !important;
   border-radius: 8px !important;
   font-size: 13px !important;
   cursor: pointer !important;
+  display: inline-block !important;
+  flex-shrink: 0 !important;
 }
 
 /* 4. Área de Mensagens */
 #ia-dlg .ia-msgs {
   flex-grow: 1 !important;
   overflow-y: auto !important;
-  padding: 16px !important;
+  padding: 20px !important;
   display: flex !important;
   flex-direction: column !important;
-  gap: 12px !important;
+  gap: 16px !important; /* Espaçamento entre as mensagens */
   scroll-behavior: smooth !important;
   margin: 0 !important;
 }
 
 #ia-dlg .ia-msg {
-  max-width: 85% !important;
-  padding: 12px 16px !important;
+  max-width: 88% !important;
+  padding: 14px 18px !important;
   border-radius: 16px !important;
   font-size: 15px !important;
-  line-height: 1.4 !important;
+  line-height: 1.5 !important;
   white-space: pre-wrap !important;
   word-wrap: break-word !important;
   display: block !important;
   margin: 0 !important;
   box-sizing: border-box !important;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
 }
 
 #ia-dlg .ia-msg.u {
@@ -132,6 +144,7 @@
   background: transparent !important;
   text-align: center !important;
   padding: 4px !important;
+  box-shadow: none !important;
 }
 
 /* Indicador de "Digitando..." */
@@ -144,6 +157,7 @@
   border-radius: 16px !important;
   border-bottom-left-radius: 4px !important;
   border: 1px solid var(--ln, #2a3a36) !important;
+  margin: 0 !important;
 }
 
 #ia-dlg .typing-indicator span {
@@ -162,36 +176,39 @@
   40% { transform: scale(1); }
 }
 
-/* 5. Rodapé e Campo de Digitação */
+/* 5. Rodapé e Campo de Digitação (Forçando lado a lado) */
 #ia-dlg .ia-footer {
-  padding: 12px 16px !important;
-  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important; /* Proteção para iPhone */
+  padding: 16px 20px !important;
+  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
   background: var(--card, #12201e) !important;
   border-top: 1px solid var(--ln, #2a3a36) !important;
   flex-shrink: 0 !important;
   margin: 0 !important;
 }
 
+/* Força a linha a ser flex e alinhar itens ao centro */
 #ia-dlg .ia-input-row {
   display: flex !important;
   flex-direction: row !important;
-  gap: 8px !important;
+  gap: 12px !important;
   align-items: center !important;
   width: 100% !important;
   margin: 0 !important;
 }
 
+/* O input ocupa o espaço restante, mas não joga o botão pra fora */
 #ia-dlg .ia-input-row input {
   flex-grow: 1 !important;
+  flex-shrink: 1 !important;
   width: 100% !important;
+  min-width: 0 !important;
   background: var(--bg, #0d1b1a) !important;
   border: 1px solid var(--ln, #2a3a36) !important;
   color: var(--ink, #fff) !important;
-  padding: 12px 16px !important;
+  padding: 14px 18px !important;
   border-radius: 24px !important;
   font-size: 15px !important;
   outline: none !important;
-  transition: border-color 0.2s !important;
   margin: 0 !important;
   box-sizing: border-box !important;
 }
@@ -200,9 +217,11 @@
   border-color: #0A3B34 !important;
 }
 
+/* O botão de enviar fica fixo e redondo */
 #ia-dlg .ia-input-row button {
-  width: 44px !important;
-  height: 44px !important;
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
   border-radius: 50% !important;
   background: #0A3B34 !important;
   color: #fff !important;
@@ -214,13 +233,13 @@
   flex-shrink: 0 !important;
   padding: 0 !important;
   margin: 0 !important;
-  transition: transform 0.1s !important;
+  transition: transform 0.1s, background 0.2s !important;
 }
 
 #ia-dlg .ia-input-row button svg {
   width: 20px !important;
   height: 20px !important;
-  transform: translateX(-1px) translateY(1px) !important;
+  transform: translateX(-2px) translateY(1px) !important; /* Centraliza o ícone */
 }
 
 #ia-dlg .ia-input-row button:active {
@@ -235,10 +254,11 @@
 
 #ia-dlg .ia-disclaimer {
   text-align: center !important;
-  font-size: 10px !important;
+  font-size: 11px !important;
   color: var(--mu, #888) !important;
-  margin: 8px 0 0 0 !important;
+  margin: 12px 0 0 0 !important;
   padding: 0 !important;
+  line-height: 1.2 !important;
 }
 
 /* =========================================================
@@ -305,14 +325,8 @@
   color: var(--ink, #fff);
 }
 
-.ia-hl-money {
-  color: #4ade80;
-  font-weight: 700;
-}
-.ia-hl-date {
-  color: #60a5fa;
-  font-weight: 600;
-}
+.ia-hl-money { color: #4ade80; font-weight: 700; }
+.ia-hl-date { color: #60a5fa; font-weight: 600; }
 
 .ia-act {
   display: inline-block;
@@ -329,9 +343,5 @@
   transition: background 0.2s, transform 0.1s;
 }
 
-.ia-act:hover {
-  background: #0c4a41;
-}
-.ia-act:active {
-  transform: scale(0.98);
-}
+.ia-act:hover { background: #0c4a41; }
+.ia-act:active { transform: scale(0.98); }
