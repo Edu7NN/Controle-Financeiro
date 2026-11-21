@@ -1,0 +1,236 @@
+/* js/ia.js — Camada 3: IA em cima do motor de fatos.
+   - A IA nunca faz conta: recebe fatos prontos e, no chat, chama o simulador.
+   - A chave da OpenAI fica na Edge Function, nunca aqui.
+   - Só um resumo agregado sai do aparelho; nomes viram "Pessoa A".
+   - Pode ser desligada em um clique.
+*/
+(() => {
+  "use strict";
+  const IA = (window.IA = {});
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const fmt = (n) => (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+  IA.fmt = fmt;
+
+  // ---------------------------------------------------------------
+  // ADAPTADOR — se seu app usa outros nomes, mexa só aqui.
+  // ---------------------------------------------------------------
+  const cfg = () => ({
+    url:  (window.SUPABASE_URL || window.CONFIG?.SUPABASE_URL || "").replace(/\/$/, ""),
+    anon: window.SUPABASE_ANON || window.SUPABASE_KEY || window.CONFIG?.SUPABASE_KEY || "",
+  });
+
+  IA.token = function () {
+    try {
+      if (window.Cloud?.token)        return window.Cloud.token();
+      if (window.Cloud?.session)      return window.Cloud.session()?.access_token;
+      if (window.Cloud?.getSession)   return window.Cloud.getSession()?.access_token;
+    } catch {}
+    for (const k of Object.keys(localStorage)) {
+      if (!k.startsWith("sb-") || !k.endsWith("-auth-token")) continue;
+      try { const v = JSON.parse(localStorage.getItem(k)); if (v?.access_token) return v.access_token; } catch {}
+    }
+    return null;
+  };
+
+  // CONTRATO de fatos. Idealmente implemente window.buildIaFacts() no
+  // diagnostico.js e devolva o objeto descrito no README. Sem ele, monta o que dá.
+  IA.buildFacts = function () {
+    if (typeof window.buildIaFacts === "function") {
+      try { return window.buildIaFacts(); } catch (e) { console.warn("buildIaFacts falhou", e); }
+    }
+    const out = { gerado_em: new Date().toISOString(), perfil: null, regras: null, decisoes: null, alertas: [], metas: [] };
+    try {
+      const ds = window.decisionSummary?.() || {};
+      out.perfil  = ds.perfil   ?? null;
+      out.regras  = ds.regras   ?? null;
+      out.decisoes = ds.decisoes ?? null;
+    } catch {}
+    return out;
+  };
+
+  IA.runSimulator = async function (args) {
+    const fn = window.simularCompra || window.simulate || window.Simulator?.run || window.simulador;
+    if (typeof fn === "function") {
+      try { return await fn(args); } catch (e) { return { erro: String(e) }; }
+    }
+    return { indisponivel: true, mensagem: "Simulador não encontrado. Peça ao usuário para abrir Análises > Simulador." };
+  };
+  // ---------------------------------------------------------------
+
+  IA.ativo    = () => localStorage.getItem("ia.ativo") !== "0";
+  IA.setAtivo = (v) => localStorage.setItem("ia.ativo", v ? "1" : "0");
+
+  function pseudonimizar(facts) {
+    const nomes = new Set();
+    (function walk(o) {
+      if (!o || typeof o !== "object") return;
+      if (Array.isArray(o)) return o.forEach(walk);
+      for (const [k, v] of Object.entries(o)) {
+        if (/^(pessoa|nome_pessoa|de_quem|nome)$/i.test(k) && typeof v === "string" && v.trim()) nomes.add(v.trim());
+        walk(v);
+      }
+    })(facts);
+    const map = new Map([...nomes].sort().map((n, i) => [n, "Pessoa " + String.fromCharCode(65 + i)]));
+    const aplicar = (o) => {
+      if (typeof o === "string") { let s = o; for (const [a, b] of map) s = s.split(a).join(b); return s; }
+      if (Array.isArray(o)) return o.map(aplicar);
+      if (o && typeof o === "object") { const r = {}; for (const [k, v] of Object.entries(o)) r[k] = aplicar(v); return r; }
+      return o;
+    };
+    return aplicar(facts);
+  }
+
+  IA.call = async function (payload) {
+    const { url, anon } = cfg();
+    const token = IA.token();
+    if (!url || !anon) throw new Error("Supabase não configurado em js/config.js");
+    if (!token)        throw new Error("Entre no banco online (Opções > Banco online) para usar a IA.");
+    if (!navigator.onLine) throw new Error("Sem internet. A IA só funciona conectada.");
+    const r = await fetch(url + "/functions/v1/ai", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await r.json().catch(() => ({}));
+    if (r.status === 429) throw new Error("Limite diário de IA atingido. Volte amanhã.");
+    if (!r.ok)            throw new Error(data.error || ("Falha " + r.status));
+    return data;
+  };
+
+  // -------- Leitura do mês --------
+  IA.gerarLeitura = async function (forcar) {
+    const out = $("#ia-out"); if (!out) return;
+    if (!IA.ativo()) { out.innerHTML = '<p class="empty">IA desligada em Opções.</p>'; return; }
+    const mes = (window.mesExibido?.() || new Date().toISOString().slice(0, 7));
+    const key = "ia.leitura." + mes;
+    if (!forcar) {
+      const cache = localStorage.getItem(key);
+      if (cache) { try { return IA.renderLeitura(JSON.parse(cache)); } catch {} }
+    }
+    out.innerHTML = '<p class="empty">Lendo os fatos…</p>';
+    try {
+      const facts = pseudonimizar(IA.buildFacts());
+      const res   = await IA.call({ mode: "leitura", facts });
+      localStorage.setItem(key, JSON.stringify(res.leitura));
+      IA.renderLeitura(res.leitura, res.usage);
+    } catch (e) {
+      out.innerHTML = '<p class="empty" style="color:var(--bd)">' + esc(e.message) + "</p>";
+    }
+  };
+
+  const labelAction = (t) => ({
+    criar_meta: "Criar meta", criar_provisao: "Criar provisão",
+    mensagem_cobranca: "Copiar cobrança", abrir_simulador: "Abrir simulador",
+  }[t] || "Aplicar");
+
+  IA.renderLeitura = function (l, usage) {
+    const out = $("#ia-out"); if (!out) return;
+    if (!l || !Array.isArray(l.prioridades) || !l.prioridades.length) {
+      out.innerHTML = '<p class="empty">Sem prioridades relevantes nos fatos deste mês.</p>';
+      return;
+    }
+    const pri = l.prioridades.slice(0, 3).map((p, i) => {
+      const act = p.action ? `<button class="s sm ia-act" data-i="${i}">${esc(labelAction(p.action.tipo))}</button>` : "";
+      return `<div class="ia-pri">
+        <h3>${esc(p.titulo || "Prioridade " + (i + 1))}</h3>
+        <div>${esc(p.explicacao || "")}</div>
+        <div class="meta">Impacto: <span class="imp">${fmt(p.impacto_reais)}</span> · Ação: ${esc(p.acao || "")} · Prazo: ${esc(p.prazo || "")}</div>
+        ${act}</div>`;
+    }).join("");
+    out.innerHTML = `<p style="margin:0 0 8px">${esc(l.resumo || "")}</p>${pri}` +
+      (usage ? `<p class="empty" style="margin:8px 0 0;font-size:12px">${usage.prompt_tokens || 0} + ${usage.completion_tokens || 0} tokens</p>` : "");
+    out.querySelectorAll(".ia-act").forEach((b) => {
+      b.addEventListener("click", () => IA.applyAction(l.prioridades[Number(b.dataset.i)].action));
+    });
+  };
+
+  IA.applyAction = async function (a) {
+    if (!a || !a.tipo) return;
+    const p = a.params || {};
+    try {
+      if (a.tipo === "criar_meta") {
+        const fn = window.openGoalDialog || window.abrirMeta || window.Metas?.nova;
+        if (typeof fn === "function") return fn(p);
+        return alert("Crie em Opções > Metas: " + (p.nome || ""));
+      }
+      if (a.tipo === "criar_provisao") {
+        return alert(`Sugestão: separar ${fmt(p.valor_mensal)}/mês para "${p.nome || "reserva"}".`);
+      }
+      if (a.tipo === "mensagem_cobranca") {
+        const msg = `Oi! Passando para lembrar do valor de ${fmt(p.valor)}${p.vencimento ? " (vence " + p.vencimento + ")" : ""}. Se já pagou, desconsidera. Obrigado!`;
+        if (navigator.share) { try { return await navigator.share({ text: msg }); } catch {} }
+        await navigator.clipboard?.writeText(msg).catch(() => {});
+        return alert("Mensagem copiada:\n\n" + msg);
+      }
+      if (a.tipo === "abrir_simulador") {
+        const fn = window.abrirSimulador || window.openSimulator;
+        if (typeof fn === "function") return fn(p);
+        return alert(`Abra Análises > Simulador e teste ${fmt(p.valor)} em ${p.parcelas || 1}x.`);
+      }
+    } catch (e) { console.warn(e); }
+  };
+
+  // -------- Chat --------
+  IA.hist = [];
+  IA.abrirChat = function () {
+    if (!IA.ativo()) return alert("IA desligada em Opções.");
+    IA.facts = pseudonimizar(IA.buildFacts());
+    IA.hist = [];
+    const msgs = $("#ia-msgs"); if (msgs) msgs.innerHTML = "";
+    $("#ia-dlg")?.showModal();
+  };
+
+  IA.enviarChat = async function (texto) {
+    texto = String(texto || "").trim();
+    if (!texto) return;
+    const msgs = $("#ia-msgs"); if (!msgs) return;
+    const add = (role, txt) => {
+      const b = document.createElement("div");
+      b.className = "b " + (role === "user" ? "u" : role === "assistant" ? "a" : "s");
+      b.textContent = txt; msgs.appendChild(b); msgs.scrollTop = msgs.scrollHeight;
+    };
+    add("user", texto);
+    IA.hist.push({ role: "user", content: texto });
+    const input = $("#ia-in");   if (input) input.value = "";
+    const btn   = $("#ia-send"); if (btn) btn.disabled = true;
+    try {
+      for (let i = 0; i < 5; i++) {
+        const res = await IA.call({ mode: "chat", facts: IA.facts, messages: IA.hist });
+        if (res.needs_tool) {
+          IA.hist.push(res.assistant_message);
+          const result = await IA.runSimulator(res.needs_tool.args);
+          IA.hist.push({ role: "tool", tool_call_id: res.needs_tool.tool_call_id, content: JSON.stringify(result) });
+          continue;
+        }
+        if (res.reply) {
+          IA.hist.push({ role: "assistant", content: res.reply });
+          add("assistant", res.reply);
+          return;
+        }
+        break;
+      }
+      add("s", "Não consegui completar. Tente de novo.");
+    } catch (e) {
+      add("s", e.message);
+    } finally { if (btn) btn.disabled = false; }
+  };
+
+  // -------- Ligação com a UI --------
+  IA.init = function () {
+    const gen = $("#ia-gen");
+    if (gen) gen.addEventListener("click", () => IA.gerarLeitura(true));
+    const open = $("#ia-open");
+    if (open) open.addEventListener("click", () => IA.abrirChat());
+    const x = $("#ia-x");
+    if (x) x.addEventListener("click", () => $("#ia-dlg")?.close());
+    const send = $("#ia-send");
+    if (send) send.addEventListener("click", () => IA.enviarChat($("#ia-in")?.value));
+    const inp = $("#ia-in");
+    if (inp) inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); IA.enviarChat(inp.value); } });
+    const cache = localStorage.getItem("ia.leitura." + (window.mesExibido?.() || new Date().toISOString().slice(0, 7)));
+    if (cache && $("#ia-out")) { try { IA.renderLeitura(JSON.parse(cache)); } catch {} }
+  };
+
+  document.addEventListener("DOMContentLoaded", IA.init);
+})();
