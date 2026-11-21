@@ -221,3 +221,33 @@ function renderCuts(){
     :'<p class="empty">Sem gastos flexíveis ou de desejo para sugerir cortes. Ajuste o peso das categorias em Opções > Perfil financeiro.</p>';
   $('cuts').querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>{F.q='';F.who='';F.st='';F.cat=b.dataset.cut;VIEW='l';showTab('gs')});
 }
+
+
+// === INTEGRAÇÃO IA (CAMADA 3) ===
+// Expõe os fatos calculados para o js/ia.js
+window.buildIaFacts = function() {
+  try {
+    // Tenta pegar os dados globais do seu sistema. 
+    // Se o seu app usar outro nome (ex: window.appState), ajuste aqui.
+    const state = window.state || window.STATE || window.dados || {};
+    
+    // Se você já tem funções que calculam os totais, use-as aqui. 
+    // Por enquanto, enviamos o perfil e as decisões para não quebrar.
+    const summary = window.decisionSummary ? window.decisionSummary() : {};
+    
+    return {
+      gerado_em: new Date().toISOString(),
+      perfil: summary.perfil || {},
+      regras: summary.regras || {},
+      decisoes: summary.decisoes || {},
+      // O ideal é você mapear os totais do mês aqui:
+      // total_gastos: state.totalGastos || 0,
+      // fixos: state.fixos || 0,
+      // parcelas: state.parcelas || 0,
+      // alertas: state.alertas || []
+    };
+  } catch (e) {
+    console.warn("Erro ao montar fatos para IA:", e);
+    return { erro: "Falha ao ler dados locais" };
+  }
+};
