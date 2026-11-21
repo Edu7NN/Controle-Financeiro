@@ -23,8 +23,6 @@
 
   IA.token = function () {
     try {
-      // O seu cloud.js salva a sessão no localStorage com a chave 'fin_sb'
-      // e o token de acesso fica na propriedade 'at'.
       const ses = JSON.parse(localStorage.getItem('fin_sb') || 'null');
       if (ses && ses.at) return ses.at;
     } catch (e) { 
@@ -48,9 +46,7 @@
   };
 
   IA.runSimulator = async function (args) {
-    // Tenta achar a função do seu simulador em vários lugares comuns
     const fn = window.simularCompra || window.simulate || window.Simulator?.run || window.simulador;
-    
     if (typeof fn === "function") {
       try { 
         const res = await fn(args); 
@@ -60,7 +56,6 @@
         return { erro: "O simulador deu erro interno: " + String(e) }; 
       }
     }
-    
     console.warn("IA.runSimulator: Função não encontrada. window.simularCompra existe?", typeof window.simularCompra);
     return { indisponivel: true, mensagem: "Simulador não encontrado. O app precisa ser atualizado." };
   };
@@ -133,6 +128,11 @@
       const res   = await IA.call({ mode: "leitura", facts });
       localStorage.setItem(key, JSON.stringify(res.leitura));
       IA.renderLeitura(res.leitura, res.usage);
+      
+      // Mostra o botão de ocultar quando gerar com sucesso
+      const toggleBtn = $("#ia-toggle");
+      if (toggleBtn) toggleBtn.style.display = "inline-block";
+      
     } catch (e) {
       out.innerHTML = '<p class="empty" style="color:var(--bd)">' + esc(e.message) + "</p>";
     }
@@ -145,25 +145,44 @@
 
   IA.renderLeitura = function (l, usage) {
     const out = $("#ia-out"); if (!out) return;
+    
+    const formatarTexto = (txt) => {
+      if (!txt) return "";
+      let html = esc(txt);
+      html = html.replace(/(R\$\s?[\d.,]+)/g, '<strong class="ia-hl-money">$1</strong>');
+      html = html.replace(/([A-Z][a-z]{2}\/\d{2})/g, '<span class="ia-hl-date">$1</span>');
+      return html;
+    };
+
     if (!l || !Array.isArray(l.prioridades) || !l.prioridades.length) {
       out.innerHTML = '<p class="empty">Sem prioridades relevantes nos fatos deste mês.</p>';
       return;
     }
+
     const pri = l.prioridades.slice(0, 3).map((p, i) => {
-      const act = p.action ? `<button class="s sm ia-act" data-i="${i}">${esc(labelAction(p.action.tipo))}</button>` : "";
-      return `<div class="ia-pri">
+      const act = p.action ? `<button class="ia-act" data-i="${i}">${esc(labelAction(p.action.tipo))}</button>` : "";
+      return `<div class="ia-pri-card">
         <h3>${esc(p.titulo || "Prioridade " + (i + 1))}</h3>
-        <div>${esc(p.explicacao || "")}</div>
-        <div class="meta">Impacto: <span class="imp">${fmt(p.impacto_reais)}</span> · Ação: ${esc(p.acao || "")} · Prazo: ${esc(p.prazo || "")}</div>
+        <p class="ia-pri-desc">${formatarTexto(p.explicacao)}</p>
+        
+        <div class="ia-meta-box">
+          <div class="ia-meta-item"><span>Impacto</span><strong>${fmt(p.impacto_reais)}</strong></div>
+          <div class="ia-meta-item"><span>Ação</span><strong>${esc(p.acao || "-")}</strong></div>
+          <div class="ia-meta-item"><span>Prazo</span><strong class="ia-hl-date">${esc(p.prazo || "-")}</strong></div>
+        </div>
         ${act}</div>`;
     }).join("");
     
-    out.innerHTML = `<p style="margin:0 0 8px">${esc(l.resumo || "")}</p>${pri}` +
-      (usage ? `<p class="empty" style="margin:8px 0 0;font-size:12px">${usage.prompt_tokens || 0} + ${usage.completion_tokens || 0} tokens</p>` : "");
+    out.innerHTML = `<p class="ia-resumo">${formatarTexto(l.resumo)}</p>${pri}` +
+      (usage ? `<p class="empty" style="margin:12px 0 0;font-size:11px;text-align:right">${usage.prompt_tokens || 0} + ${usage.completion_tokens || 0} tokens</p>` : "");
       
     out.querySelectorAll(".ia-act").forEach((b) => {
       b.addEventListener("click", () => IA.applyAction(l.prioridades[Number(b.dataset.i)].action));
     });
+
+    // Garante que o botão de ocultar está visível quando renderiza algo
+    const toggleBtn = $("#ia-toggle");
+    if (toggleBtn) toggleBtn.style.display = "inline-block";
   };
 
   IA.applyAction = async function (a) {
@@ -231,7 +250,6 @@
     const input = $("#ia-in");   if (input) input.value = "";
     const btn   = $("#ia-send"); if (btn) btn.disabled = true;
 
-    // Adiciona o indicador de digitando
     const typing = document.createElement("div");
     typing.className = "typing-indicator";
     typing.innerHTML = "<span></span><span></span><span></span>";
@@ -250,7 +268,7 @@
         }
         
         if (res.reply) {
-          typing.remove(); // Remove o "digitando"
+          typing.remove();
           IA.hist.push({ role: "assistant", content: res.reply });
           add("assistant", res.reply);
           return;
@@ -281,10 +299,24 @@
     const inp = $("#ia-in");
     if (inp) inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); IA.enviarChat(inp.value); } });
     
+    // Lógica do botão Ocultar/Mostrar Leitura
+    const toggleBtn = $("#ia-toggle");
+    const outDiv = $("#ia-out");
+    if (toggleBtn && outDiv) {
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = outDiv.style.display === "none";
+        outDiv.style.display = isHidden ? "block" : "none";
+        toggleBtn.textContent = isHidden ? "Ocultar" : "Mostrar";
+      });
+    }
+
     let mes = new Date().toISOString().slice(0, 7);
     try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
+    
     const cache = localStorage.getItem("ia.leitura." + mes);
-    if (cache && $("#ia-out")) { try { IA.renderLeitura(JSON.parse(cache)); } catch {} }
+    if (cache && outDiv) { 
+      try { IA.renderLeitura(JSON.parse(cache)); } catch {} 
+    }
   };
 
   document.addEventListener("DOMContentLoaded", IA.init);
