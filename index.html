@@ -172,17 +172,38 @@
 <dialog id="rp" class="wide"><h2 id="rpt" style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
 <dialog id="cld"><div id="cldc"></div></dialog>
 <dialog id="lk"><div class="lkc"><img src="icons/icon-192.png" width="72" height="72" alt=""><h2>Controle financeiro</h2><p class="empty" style="margin:0">Digite seu PIN para abrir</p><input id="lkp" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"><p id="lke" role="alert" style="color:var(--bd);margin:0;min-height:1.5em"></p><button id="lkb">Entrar</button></div></dialog>
-<dialog id="ia-dlg" class="wide">
-  <div class="f">
-    <div class="lh"><h2 style="margin:0">Pergunte ao seu dinheiro</h2><button class="s sm" id="ia-x">Fechar</button></div>
-    <div id="ia-msgs" class="ia-msgs" aria-live="polite"></div>
-    <div class="cr" style="grid-template-columns:1fr auto;margin-top:8px">
-      <input id="ia-in" placeholder="Ex.: posso comprar um celular de R$ 2.400?" autocomplete="off">
-      <button id="ia-send">Enviar</button>
+
+<dialog id="ia-dlg" class="ia-dialog">
+  <div class="ia-chat-wrapper">
+    <!-- Cabeçalho -->
+    <header class="ia-header">
+      <div>
+        <h2>Seu Dinheiro</h2>
+        <span class="ia-status">● Online (Gemini)</span>
+      </div>
+      <button class="s sm ia-close" id="ia-x">Fechar</button>
+    </header>
+
+    <!-- Área de Mensagens -->
+    <div id="ia-msgs" class="ia-msgs" aria-live="polite">
+      <div class="ia-msg a">
+        Olá! Eu sou o assistente do seu Controle Financeiro. Eu já li os seus gastos e alertas deste mês. O que você quer saber? (Ex: "Posso comprar um celular de R$ 2.400?")
+      </div>
     </div>
-    <p class="empty" style="margin:8px 0 0;font-size:12px">A IA recebe só um resumo agregado. Nomes viram "Pessoa A". Só funciona com internet.</p>
+
+    <!-- Área de Input -->
+    <div class="ia-footer">
+      <div class="ia-input-row">
+        <input id="ia-in" placeholder="Pergunte algo ou faça uma simulação..." autocomplete="off">
+        <button id="ia-send" aria-label="Enviar mensagem">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+        </button>
+      </div>
+      <p class="ia-disclaimer">A IA recebe só um resumo agregado. Nomes viram "Pessoa A".</p>
+    </div>
   </div>
 </dialog>
+
 <div id="toast" popover="manual" role="status"></div>
 <script defer src="js/version.js"></script>
 <script defer src="js/config.js"></script>
@@ -204,7 +225,7 @@
 <script defer src="js/decisoes.js"></script>
 <script defer src="js/diagnostico.js"></script>
 <script defer src="js/relatorio.js"></script>
-<script defer src="js/ia.js"></script> <!-- O ia.js tem que estar depois do diagnostico.js -->
+<script defer src="js/ia.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>
 <script defer src="js/lock.js"></script>
