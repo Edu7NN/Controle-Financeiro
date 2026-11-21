@@ -380,25 +380,28 @@ window.simularCompra = function(args) {
     const tv = args.valor_total || (args.valor_parcela ? args.valor_parcela * args.parcelas : 0);
     const n = Math.max(1, args.parcelas || 1);
     
-    // Tenta o mês pedido, se não tiver, usa o mês atual do app
-    const pedido = args.mes_inicio || (typeof mesExibido === 'function' ? mesExibido() : todayKey());
-    let st = pedido;
-    let mudouMes = false;
-
-    // Se o mês atual não tiver salário, procura o próximo mês que tenha
+    let st = args.mes_inicio;
+    if (!st) st = (typeof mesExibido === 'function' ? mesExibido() : todayKey());
+    
+    // 1. Tenta achar o próximo mês com salário a partir do mês atual
     if (!sal(st)) {
-      for (let i = 1; i <= 12; i++) {
+      for (let i = 1; i <= 24; i++) {
         const nextM = add(st, i);
-        if (sal(nextM)) { 
+        if (sal(nextM) > 0) { 
           st = nextM; 
-          mudouMes = true;
           break; 
         }
       }
     }
     
-    if (!tv || tv <= 0) return { erro: "Valor inválido" };
-    if (!sal(st)) return { erro: "Sem receita cadastrada nos próximos 12 meses. Informe o salário em Início > Detalhes e receitas." };
+    // 2. Fallback definitivo: pega o primeiro mês que tiver salário na lista global
+    if (!sal(st)) {
+      const months = Object.keys(S.salary || {}).sort();
+      if (months.length > 0) st = months[0];
+    }
+
+    if (!tv || tv <= 0) return { erro: "Valor inválido." };
+    if (!sal(st)) return { erro: "Sem receita cadastrada. Por favor, cadastre o seu salário em Opções > Salários." };
 
     const total = tv;
     const val = Math.round(total / n * 100) / 100;
@@ -448,9 +451,7 @@ window.simularCompra = function(args) {
       impacto_mensal: val,
       total: total,
       meses_afetados: n,
-      sugestoes: L,
-      // Avisa a IA que precisou pular de mês
-      nota_mes: mudouMes ? "Atenção: não há salário em " + lab(pedido) + ". A simulação foi feita usando " + lab(st) + " como base." : null
+      sugestoes: L
     };
   } catch (e) {
     return { erro: String(e) };
