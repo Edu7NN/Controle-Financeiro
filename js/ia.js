@@ -13,28 +13,26 @@
   IA.fmt = fmt;
 
   // ---------------------------------------------------------------
-  // ADAPTADOR — se seu app usa outros nomes, mexa só aqui.
+  // ADAPTADOR — Integrado com as variáveis do config.js e cloud.js
   // ---------------------------------------------------------------
-  const cfg = () => ({
-    url:  (window.SUPABASE_URL || window.CONFIG?.SUPABASE_URL || "").replace(/\/$/, ""),
-    anon: window.SUPABASE_ANON || window.SUPABASE_KEY || window.CONFIG?.SUPABASE_KEY || "",
-  });
+  const cfg = () => {
+    const u = typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : (window.SUPABASE_URL || "");
+    const k = typeof SUPABASE_KEY !== 'undefined' ? SUPABASE_KEY : (window.SUPABASE_KEY || window.SUPABASE_ANON || "");
+    return { url: u.replace(/\/$/, ""), anon: k };
+  };
 
   IA.token = function () {
     try {
-      if (window.Cloud?.token)        return window.Cloud.token();
-      if (window.Cloud?.session)      return window.Cloud.session()?.access_token;
-      if (window.Cloud?.getSession)   return window.Cloud.getSession()?.access_token;
-    } catch {}
-    for (const k of Object.keys(localStorage)) {
-      if (!k.startsWith("sb-") || !k.endsWith("-auth-token")) continue;
-      try { const v = JSON.parse(localStorage.getItem(k)); if (v?.access_token) return v.access_token; } catch {}
+      // O seu cloud.js salva a sessão no localStorage com a chave 'fin_sb'
+      // e o token de acesso fica na propriedade 'at'.
+      const ses = JSON.parse(localStorage.getItem('fin_sb') || 'null');
+      if (ses && ses.at) return ses.at;
+    } catch (e) { 
+      console.warn("Erro ao ler token do cloud.js", e); 
     }
     return null;
   };
 
-  // CONTRATO de fatos. Idealmente implemente window.buildIaFacts() no
-  // diagnostico.js e devolva o objeto descrito no README. Sem ele, monta o que dá.
   IA.buildFacts = function () {
     if (typeof window.buildIaFacts === "function") {
       try { return window.buildIaFacts(); } catch (e) { console.warn("buildIaFacts falhou", e); }
@@ -42,14 +40,15 @@
     const out = { gerado_em: new Date().toISOString(), perfil: null, regras: null, decisoes: null, alertas: [], metas: [] };
     try {
       const ds = window.decisionSummary?.() || {};
-      out.perfil  = ds.perfil   ?? null;
-      out.regras  = ds.regras   ?? null;
+      out.perfil   = ds.perfil   ?? null;
+      out.regras   = ds.regras   ?? null;
       out.decisoes = ds.decisoes ?? null;
     } catch {}
     return out;
   };
 
   IA.runSimulator = async function (args) {
+    // Tenta achar a função do seu simulador em vários lugares comuns
     const fn = window.simularCompra || window.simulate || window.Simulator?.run || window.simulador;
     if (typeof fn === "function") {
       try { return await fn(args); } catch (e) { return { erro: String(e) }; }
@@ -85,16 +84,18 @@
     const { url, anon } = cfg();
     const token = IA.token();
     if (!url || !anon) throw new Error("Supabase não configurado em js/config.js");
-    if (!token)        throw new Error("Entre no banco online (Opções > Banco online) para usar a IA.");
+    if (!token) throw new Error("Entre no banco online (Opções > Banco online) para usar a IA.");
     if (!navigator.onLine) throw new Error("Sem internet. A IA só funciona conectada.");
+    
     const r = await fetch(url + "/functions/v1/ai", {
       method: "POST",
       headers: { "Authorization": "Bearer " + token, "apikey": anon, "content-type": "application/json" },
       body: JSON.stringify(payload),
     });
+    
     const data = await r.json().catch(() => ({}));
     if (r.status === 429) throw new Error("Limite diário de IA atingido. Volte amanhã.");
-    if (!r.ok)            throw new Error(data.error || ("Falha " + r.status));
+    if (!r.ok) throw new Error(data.error || ("Falha " + r.status));
     return data;
   };
 
@@ -102,12 +103,17 @@
   IA.gerarLeitura = async function (forcar) {
     const out = $("#ia-out"); if (!out) return;
     if (!IA.ativo()) { out.innerHTML = '<p class="empty">IA desligada em Opções.</p>'; return; }
-    const mes = (window.mesExibido?.() || new Date().toISOString().slice(0, 7));
+    
+    // Tenta descobrir o mês atual (se o seu app tiver uma função global)
+    let mes = new Date().toISOString().slice(0, 7);
+    try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
+    
     const key = "ia.leitura." + mes;
     if (!forcar) {
       const cache = localStorage.getItem(key);
       if (cache) { try { return IA.renderLeitura(JSON.parse(cache)); } catch {} }
     }
+    
     out.innerHTML = '<p class="empty">Lendo os fatos…</p>';
     try {
       const facts = pseudonimizar(IA.buildFacts());
@@ -138,8 +144,10 @@
         <div class="meta">Impacto: <span class="imp">${fmt(p.impacto_reais)}</span> · Ação: ${esc(p.acao || "")} · Prazo: ${esc(p.prazo || "")}</div>
         ${act}</div>`;
     }).join("");
+    
     out.innerHTML = `<p style="margin:0 0 8px">${esc(l.resumo || "")}</p>${pri}` +
       (usage ? `<p class="empty" style="margin:8px 0 0;font-size:12px">${usage.prompt_tokens || 0} + ${usage.completion_tokens || 0} tokens</p>` : "");
+      
     out.querySelectorAll(".ia-act").forEach((b) => {
       b.addEventListener("click", () => IA.applyAction(l.prioridades[Number(b.dataset.i)].action));
     });
@@ -194,6 +202,7 @@
     IA.hist.push({ role: "user", content: texto });
     const input = $("#ia-in");   if (input) input.value = "";
     const btn   = $("#ia-send"); if (btn) btn.disabled = true;
+    
     try {
       for (let i = 0; i < 5; i++) {
         const res = await IA.call({ mode: "chat", facts: IA.facts, messages: IA.hist });
@@ -228,7 +237,10 @@
     if (send) send.addEventListener("click", () => IA.enviarChat($("#ia-in")?.value));
     const inp = $("#ia-in");
     if (inp) inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); IA.enviarChat(inp.value); } });
-    const cache = localStorage.getItem("ia.leitura." + (window.mesExibido?.() || new Date().toISOString().slice(0, 7)));
+    
+    let mes = new Date().toISOString().slice(0, 7);
+    try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
+    const cache = localStorage.getItem("ia.leitura." + mes);
     if (cache && $("#ia-out")) { try { IA.renderLeitura(JSON.parse(cache)); } catch {} }
   };
 
