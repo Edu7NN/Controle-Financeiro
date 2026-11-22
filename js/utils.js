@@ -1,11 +1,13 @@
 /* js/utils.js — Funções utilitárias de formatação, datas e avisos */
-
 const $ = s => document.querySelector(s);
 
-// --- PROTEÇÃO CONTRA DADOS CORROMPIDOS (O FIM DO ERRO 'SPLIT') ---
+// --- PROTEÇÃO CONTRA DADOS CORROMPIDOS ---
 function num(m) {
-  if (!m || typeof m !== 'string' || !m.includes('-')) return 0;
-  const [y, mo] = m.split('-').map(Number);
+  if (!m || typeof m !== 'string') return 0; // <--- ESTA LINHA É A CHAVE DE TUDO
+  const parts = m.split('-');
+  if (parts.length < 2) return 0;
+  const y = Number(parts[0]);
+  const mo = Number(parts[1]);
   if (isNaN(y) || isNaN(mo)) return 0;
   return y * 12 + (mo - 1);
 }
@@ -27,7 +29,6 @@ function todayKey() {
   return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0');
 }
 
-// --- FORMATAÇÃO DE VALORES ---
 function R(v) {
   if (typeof PRIV !== 'undefined' && PRIV) return 'R$ ••••';
   return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -43,7 +44,6 @@ function brDate(dStr) {
   return isNaN(d) ? '' : d.toLocaleDateString('pt-BR');
 }
 
-// --- NOMES DOS MESES ---
 const MS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const ML = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 
@@ -61,29 +61,21 @@ function lab(m) {
   return ML[mo - 1] + ' ' + y;
 }
 
-// --- AVISOS (TOAST) ---
 let toastTimer = null;
 function toast(msg, act) {
   const box = document.getElementById('toast');
-  if (!box) return alert(msg); // Fallback caso o HTML não tenha o toast
-
+  if (!box) return alert(msg); 
   box.innerHTML = `<span>${msg}</span>${act ? '<button id="toast-act">Desfazer</button>' : ''}`;
   box.hidden = false;
   box.classList.add('show');
-  
   if (act) {
     const btn = document.getElementById('toast-act');
     if (btn) btn.onclick = () => { act(); box.hidden = true; box.classList.remove('show'); };
   }
-
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { 
-    box.hidden = true; 
-    box.classList.remove('show'); 
-  }, act ? 5000 : 3000);
+  toastTimer = setTimeout(() => { box.hidden = true; box.classList.remove('show'); }, act ? 5000 : 3000);
 }
 
-// --- SIMULADOR E OUTRAS UTILS ---
 function parseVal(str) {
   if (!str) return 0;
   return Number(String(str).replace(/\./g, '').replace(',', '.'));
