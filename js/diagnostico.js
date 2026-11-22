@@ -461,65 +461,65 @@ window.simularCompra = function(args) {
 // Adaptador de Lançamento de Gastos por IA
 window.criarGastoPorIA = function(args) {
   try {
-    // Validações de segurança
-    if (!args.nome || !args.valor || args.valor <= 0) {
-      return { erro: "Nome e valor válido são obrigatórios." };
+    // 1. Sanitiza o valor (remove R$, espaços, troca vírgula por ponto)
+    const cleanVal = String(args.valor || "").replace(/[^\d,.-]/g, '').replace(',', '.');
+    const numVal = Number(cleanVal);
+
+    if (!args.nome || isNaN(numVal) || numVal <= 0) {
+      return { erro: "Dados incompletos. A IA precisa enviar nome e um valor numérico válido." };
     }
 
-    // Tenta achar a categoria exata, senão usa 'Outros'
+    // 2. Acha a categoria (tenta exata, tenta aproximada, senão vai pra Outros)
     let catFinal = "Outros";
     if (typeof CATS !== 'undefined' && Array.isArray(CATS)) {
-      const found = CATS.find(c => c.toLowerCase() === String(args.categoria).toLowerCase());
+      const searchCat = String(args.categoria || "").toLowerCase();
+      const found = CATS.find(c => c.toLowerCase() === searchCat);
       if (found) catFinal = found;
       else {
-        // Tenta achar por aproximação (ex: "comida" -> "Alimentação")
-        const aprox = CATS.find(c => c.toLowerCase().includes(String(args.categoria).toLowerCase()) || String(args.categoria).toLowerCase().includes(c.toLowerCase()));
+        const aprox = CATS.find(c => c.toLowerCase().includes(searchCat) || searchCat.includes(c.toLowerCase()));
         if (aprox) catFinal = aprox;
       }
     }
 
-    // Define o mês (se a IA não falou, usa o mês atual que está na tela)
+    // 3. Acha o cartão
+    let cardFinal = "";
+    if (args.cartao && typeof S !== 'undefined' && Array.isArray(S.cards)) {
+      const searchCard = String(args.cartao).toLowerCase();
+      const foundCard = S.cards.find(c => c.name.toLowerCase().includes(searchCard));
+      if (foundCard) cardFinal = foundCard.id;
+    }
+
+    // 4. Define o mês
     let mesFinal = args.mes;
     if (!mesFinal || !/^\d{4}-\d{2}$/.test(mesFinal)) {
       mesFinal = typeof mesExibido === 'function' ? mesExibido() : todayKey();
     }
 
-    // Gera um ID único seguro
-    const id = (typeof crypto !== 'undefined' && crypto.randomUUID) 
-      ? crypto.randomUUID() 
-      : Date.now().toString() + Math.random().toString(36).substring(2);
-
-    // Monta o objeto do gasto no formato exato do seu app
+    // 5. Gera um ID e monta o objeto no formato do app
+    const id = Date.now().toString() + Math.floor(Math.random() * 1000);
     const novoGasto = {
       id: id,
-      name: args.nome,
-      val: Number(args.valor),
+      name: String(args.nome),
+      val: numVal,
       cat: catFinal,
-      rec: false,  // Avulso
-      n: 1,        // 1 parcela
-      st: mesFinal,// Mês de início
-      k: 1,        // Parcela atual
-      who: args.quem || "", // Vazio = eu
-      card: args.cartao || "",
-      dy: new Date().getDate() // Dia de hoje por padrão
+      rec: false,
+      n: 1,
+      st: mesFinal,
+      k: 1,
+      who: args.quem ? String(args.quem) : "",
+      card: cardFinal
     };
 
-    // Adiciona ao estado global do app
+    // 6. Salva e atualiza a tela
     if (typeof S !== 'undefined' && S.items) {
       S.items.push(novoGasto);
-      
-      // Salva e atualiza a tela
       if (typeof save === 'function') save();
       if (typeof render === 'function') render();
-      
-      // Mostra o aviso verde na tela (Toast)
-      if (typeof toast === 'function') {
-        toast(`Gasto "${args.nome}" cadastrado!`);
-      }
+      if (typeof toast === 'function') toast(`Gasto "${args.nome}" cadastrado!`);
 
       return { 
         sucesso: true, 
-        mensagem: `Gasto '${args.nome}' de R$ ${args.valor} cadastrado com sucesso na categoria ${catFinal} para o mês ${mesFinal}.` 
+        mensagem: `Gasto '${args.nome}' de R$ ${numVal.toFixed(2)} cadastrado na categoria ${catFinal} para ${mesFinal}.` 
       };
     } else {
       return { erro: "Estado do aplicativo não encontrado." };
@@ -527,6 +527,6 @@ window.criarGastoPorIA = function(args) {
 
   } catch (e) {
     console.error("Erro ao criar gasto via IA:", e);
-    return { erro: "Falha interna ao salvar o gasto: " + String(e) };
+    return { erro: "Falha interna: " + String(e) };
   }
 };
