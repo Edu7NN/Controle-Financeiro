@@ -5,6 +5,7 @@ const DECISION_DAYS={snooze:14,done:45};
 const dayStr=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
 const dayKey=()=>dayStr(new Date());
 const addDays=n=>{const d=new Date();return dayStr(new Date(d.getFullYear(),d.getMonth(),d.getDate()+n))};
+const brDate=iso=>iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
 
 /** Última decisão registrada para a chave de um alerta (ou null). */
 const decisionOf=k=>[...S.decisions].reverse().find(d=>d.k===k)||null;
