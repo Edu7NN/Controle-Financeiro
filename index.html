@@ -8,12 +8,19 @@
 <link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Finanças">
 <title>Controle financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="vendor/chart.umd.js"></script>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/ia.css">
+
+<!-- BLINDAGEM: Cria as variáveis vitais antes de qualquer outro script -->
+<script>
+  window.PRIV = false;
+  window.S = { items: [], salary: {}, cards: [], goals: [], paid: {}, decisions: [], profile: { onboarded: true, rules: { reserve: 6, parc: 25, trav: 50 } }, income: [], categories: [] };
+</script>
 </head>
 <body><main>
 <header>
@@ -185,7 +192,6 @@
 
 <dialog id="ia-dlg" class="ia-dialog">
   <div class="ia-chat-wrapper">
-    <!-- Cabeçalho -->
     <header class="ia-header">
       <div>
         <h2>Seu Dinheiro</h2>
@@ -193,15 +199,9 @@
       </div>
       <button class="s sm ia-close" id="ia-x">Fechar</button>
     </header>
-
-    <!-- Área de Mensagens -->
     <div id="ia-msgs" class="ia-msgs" aria-live="polite">
-      <div class="ia-msg a">
-        Olá! Eu sou o assistente do seu Controle Financeiro. Eu já li os seus gastos e alertas deste mês. O que você quer saber? (Ex: "Posso comprar um celular de R$ 2.400?")
-      </div>
+      <div class="ia-msg a">Olá! Eu sou o assistente do seu Controle Financeiro. Eu já li os seus gastos e alertas deste mês. O que você quer saber? (Ex: "Posso comprar um celular de R$ 2.400?")</div>
     </div>
-
-    <!-- Área de Input -->
     <div class="ia-footer">
       <div class="ia-input-row">
         <input id="ia-in" placeholder="Pergunte algo ou faça uma simulação..." autocomplete="off">
