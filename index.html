@@ -4,13 +4,25 @@
 <meta name="theme-color" content="#0A3B34">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
 <title>Controle financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="vendor/chart.umd.js"></script>
 <link rel="stylesheet" href="css/styles.css">
 <link rel="stylesheet" href="css/ia.css">
+
+<!-- 🚨 DESTRUIDOR DE CACHE: Roda antes de tudo -->
 <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(function(regs) {
+      for(let r of regs) r.unregister();
+      caches.keys().then(function(keys) {
+        Promise.all(keys.map(function(k) { return caches.delete(k); })).then(function() {
+          console.log("Cache limpo automaticamente.");
+        });
+      });
+    });
+  }
+  // Define variáveis globais vitais antes de carregar os scripts
   window.PRIV = false;
   window.S = { items: [], salary: {}, cards: [], goals: [], paid: {}, decisions: [], profile: { onboarded: true, rules: { reserve: 6, parc: 25, trav: 50 } }, income: [], categories: [] };
 </script>
@@ -48,20 +60,18 @@
 
 <div class="pane" id="pane-an" hidden>
 <div class="seg pseg" id="pseg"><button data-p="1">Mês</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button><button data-p="12">12 meses</button><button data-p="ano">Ano</button></div>
-<p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
+<p id="pdesc" class="empty"></p>
 <section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
 <section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
 <section class="card" id="ia-card">
-  <div class="lh" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+  <div class="lh" style="display: flex; justify-content: space-between; align-items: center;">
     <h2 style="margin: 0;">Leitura do mês (IA)</h2>
     <div style="display: flex; gap: 8px;">
       <button class="s sm" id="ia-toggle" style="display: none;">Ocultar</button>
       <button class="s sm" id="ia-gen">Gerar</button>
     </div>
   </div>
-  <div id="ia-out" style="margin-top: 12px;">
-    <p class="empty" style="margin:0; font-size: 13px;">Sob demanda: a IA lê os fatos já calculados.</p>
-  </div>
+  <div id="ia-out" style="margin-top: 12px;"><p class="empty">A IA lê os fatos calculados...</p></div>
 </section>
 <section class="card" id="ia-chat-card">
   <div class="lh"><h2>Pergunte ao seu dinheiro</h2><button class="s sm" id="ia-open">Abrir conversa</button></div>
@@ -80,15 +90,14 @@
 <section class="sub"><h2>E se eu comprar?</h2>
 <div class="fs">
 <div><label for="sv">Valor (R$)</label><input id="sv" inputmode="decimal"></div>
-<div><label for="sk">Valor informado</label><select id="sk"><option value="t">Total da compra</option><option value="p">Por parcela</option></select></div>
+<div><label for="sk">Valor informado</label><select id="sk"><option value="t">Total</option><option value="p">Por parcela</option></select></div>
 <div><label for="sn">Parcelas</label><input id="sn" type="number" min="1" max="72" value="1"></div>
 <div><label for="ss">Primeira parcela em</label><input id="ss" type="month"></div>
 </div>
 <div id="sr" style="margin-top:14px"></div>
-<div class="cv" style="margin-top:12px"><canvas id="c3"></canvas></div>
+<div class="cv"><canvas id="c3"></canvas></div>
 </section>
-<section class="sub"><h2>Relatório e exportação</h2>
-<div class="exp"><button id="xr">Relatório do mês</button><button id="xp" hidden>Resumo do período</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
+<section class="sub"><h2>Relatório e exportação</h2><div class="exp"><button id="xr">Relatório do mês</button><button id="xp" hidden>Resumo do período</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
 </div></details>
 </div>
 
@@ -109,7 +118,7 @@
 
 <dialog id="qd"><div class="f">
 <div class="w lh"><h2>Novo gasto</h2><button type="button" class="s sm" id="qinc">+ Receita</button></div>
-<div class="w"><label for="nm">Nome</label><input id="nm" list="nms" autocomplete="off"></div>
+<div class="w"><label for="nm">Nome</label><input id="nm" list="nms"></div>
 <div class="w"><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal"></div>
 <p class="empty w" id="cth"></p>
 <div class="w"><details id="mo"><summary>Mais opções</summary><div class="f">
