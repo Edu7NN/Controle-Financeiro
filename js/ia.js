@@ -256,13 +256,28 @@
     msgs.appendChild(typing);
     msgs.scrollTop = msgs.scrollHeight;
     
-    try {
+      try {
       for (let i = 0; i < 5; i++) {
         const res = await IA.call({ mode: "chat", facts: IA.facts, messages: IA.hist });
         
         if (res.needs_tool) {
           IA.hist.push(res.assistant_message);
-          const result = await IA.runSimulator(res.needs_tool.args);
+          let result;
+          
+          // Se a IA pediu para criar um gasto
+          if (res.needs_tool.name === "criar_gasto") {
+            result = await window.criarGastoPorIA(res.needs_tool.args);
+          } 
+          // Se a IA pediu para simular uma compra
+          else if (res.needs_tool.name === "simular_compra") {
+            result = await IA.runSimulator(res.needs_tool.args);
+          } 
+          // Fallback para ferramentas desconhecidas
+          else {
+            result = { erro: "Ferramenta não reconhecida." };
+          }
+
+          // Devolve o resultado para a IA continuar a conversa
           IA.hist.push({ role: "tool", tool_call_id: res.needs_tool.tool_call_id, content: JSON.stringify(result) });
           continue;
         }
