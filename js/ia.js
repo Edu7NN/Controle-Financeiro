@@ -256,7 +256,7 @@
     msgs.appendChild(typing);
     msgs.scrollTop = msgs.scrollHeight;
     
-      try {
+    try {
       for (let i = 0; i < 5; i++) {
         const res = await IA.call({ mode: "chat", facts: IA.facts, messages: IA.hist });
         
@@ -264,17 +264,23 @@
           IA.hist.push(res.assistant_message);
           let result;
           
-          // Se a IA pediu para criar um gasto
-          if (res.needs_tool.name === "criar_gasto") {
-            result = await window.criarGastoPorIA(res.needs_tool.args);
-          } 
-          // Se a IA pediu para simular uma compra
-          else if (res.needs_tool.name === "simular_compra") {
-            result = await IA.runSimulator(res.needs_tool.args);
-          } 
-          // Fallback para ferramentas desconhecidas
-          else {
-            result = { erro: "Ferramenta não reconhecida." };
+          try {
+            // Se a IA pediu para criar um gasto
+            if (res.needs_tool.name === "criar_gasto") {
+              result = await window.criarGastoPorIA(res.needs_tool.args);
+            } 
+            // Se a IA pediu para simular uma compra
+            else if (res.needs_tool.name === "simular_compra") {
+              result = await IA.runSimulator(res.needs_tool.args);
+            } 
+            // Fallback para ferramentas desconhecidas
+            else {
+              result = { erro: "Ferramenta não reconhecida." };
+            }
+          } catch (toolError) {
+            // Se a ferramenta der qualquer erro de sintaxe ou execução, captura aqui
+            console.error("Erro na execução da ferramenta:", toolError);
+            result = { erro: "Falha interna ao executar a ação: " + String(toolError) };
           }
 
           // Devolve o resultado para a IA continuar a conversa
