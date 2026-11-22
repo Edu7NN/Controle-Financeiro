@@ -1,9 +1,11 @@
-/* js/utils.js — Funções utilitárias de formatação, datas e avisos */
-const $ = s => document.querySelector(s);
+/* js/utils.js — Funções utilitárias (CORRIGIDO) */
+
+// AQUI ESTÁ A CORREÇÃO: Voltamos a usar getElementById
+const $ = s => document.getElementById(s);
 
 // --- PROTEÇÃO CONTRA DADOS CORROMPIDOS ---
 function num(m) {
-  if (!m || typeof m !== 'string') return 0; // <--- ESTA LINHA É A CHAVE DE TUDO
+  if (!m || typeof m !== 'string') return 0; 
   const parts = m.split('-');
   if (parts.length < 2) return 0;
   const y = Number(parts[0]);
