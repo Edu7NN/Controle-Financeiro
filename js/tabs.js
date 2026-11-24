@@ -1,6 +1,4 @@
-/* js/tabs.js */
 var TAB = 'in';
-var PRIV = localStorage.getItem("hidden") === "1";
 
 function showTab(t) {
   TAB = t;
@@ -16,21 +14,25 @@ function showTab(t) {
   });
 
   if (typeof render === 'function') render();
-  if (t === 'op' && typeof openCfg === 'function') openCfg();
+  
+  // Abre a tela de opções (Configurações)
+  if (t === 'op' && typeof openCfg === 'function') {
+    try { openCfg(); } catch(e) { console.warn("Erro ao abrir opções:", e); }
+  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   const eyeBtn = document.getElementById('eye');
   if (eyeBtn) {
     eyeBtn.onclick = () => {
-      PRIV = !PRIV;
-      localStorage.setItem("hidden", PRIV ? "1" : "0");
+      window.PRIV = !window.PRIV;
+      localStorage.setItem("hidden", window.PRIV ? "1" : "0");
       if (typeof render === 'function') render();
-      if (typeof openCfg === 'function' && TAB === 'op') openCfg();
+      if (window.TAB === 'op' && typeof openCfg === 'function') openCfg();
     };
   }
+
   document.querySelectorAll('.tabs button[data-tab]').forEach(btn => {
     btn.onclick = () => showTab(btn.dataset.tab);
   });
-  showTab('in');
 });
