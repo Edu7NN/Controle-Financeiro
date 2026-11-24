@@ -1,25 +1,23 @@
 <!doctype html>
 <html lang="pt-BR"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Controle financeiro pessoal: gastos, parcelas, recorrências e backup">
 <meta name="theme-color" content="#0A3B34">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Finanças">
 <title>Controle financeiro</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="vendor/chart.umd.js"></script>
 <link rel="stylesheet" href="css/styles.css">
-<link rel="stylesheet" href="css/ia.css">
-<script>
-  // BLINDAGEM MÁXIMA: Define variáveis antes de tudo
-  window.PRIV = false;
-  window.TETO = 0.7;
-  window.S = { items: [], salary: {}, cards: [], goals: [], paid: {}, decisions: [], profile: { onboarded: true, rules: { reserve: 6, parc: 25, trav: 50 } }, income: [], categories: [] };
-</script>
 </head>
 <body><main>
 <header>
-<div class="hrow"><h1>Controle financeiro</h1><div class="hb"><button class="pill" id="bst" hidden></button><button id="eye"></button></div></div>
-<div class="nav" id="mnav"><button class="g" id="pv">‹</button><b id="ml"></b><button class="g" id="nx">›</button></div>
+<div class="hrow"><h1>Controle financeiro</h1><div class="hb"><button class="pill" id="bst" hidden aria-label="Abrir opções e backup"></button><button id="eye" aria-label="Ocultar valores"></button></div></div>
+<div class="nav" id="mnav"><button class="g" id="pv" aria-label="Mês anterior">‹</button><b id="ml"></b><button class="g" id="nx" aria-label="Próximo mês">›</button></div>
 </header>
 
 <div class="pane" id="pane-in">
@@ -36,84 +34,135 @@
 </div>
 
 <div class="pane" id="pane-gs" hidden>
-<div class="seg" role="group"><button data-v="l" class="on">Lista</button><button data-v="f">Faturas</button></div>
+<div class="seg" role="group" aria-label="Visão"><button data-v="l" class="on">Lista</button><button data-v="f">Faturas</button></div>
 <section class="card" id="v-l">
 <div class="lh"><h2>Gastos do mês</h2><button class="s sm" id="selb">Selecionar</button></div>
-<input id="q" type="search" placeholder="Buscar gasto" autocomplete="off">
-<details id="flt" class="flt"><summary id="fsm">Filtros</summary><div class="fl"><select id="fc"></select><select id="fw"></select><select id="fs"><option value="">Todos</option><option value="p">Pendentes</option><option value="g">Pagos</option></select></div></details>
-<div class="ls"><p id="lsum" class="empty"></p><button class="s sm" id="fclr" hidden>Limpar</button></div>
+<input id="q" type="search" placeholder="Buscar gasto" aria-label="Buscar gasto" autocomplete="off">
+<details id="flt" class="flt"><summary id="fsm">Filtros</summary><div class="fl"><select id="fc" aria-label="Categoria"></select><select id="fw" aria-label="Pessoa"></select><select id="fs" aria-label="Situação"><option value="">Todos</option><option value="p">Pendentes</option><option value="g">Pagos</option></select></div></details>
+<div class="ls"><p id="lsum" class="empty"></p><button class="s sm" id="fclr" hidden>Limpar filtros</button></div>
 <div id="list"></div>
 </section>
-<section class="card" id="v-f" hidden><h2>Faturas</h2><div id="fat"></div></section>
+<section class="card" id="v-f" hidden><h2>Faturas do cartão</h2><div id="fat"></div></section>
 </div>
 
 <div class="pane" id="pane-an" hidden>
-<div class="seg pseg" id="pseg"><button data-p="1">Mês</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button><button data-p="12">12 meses</button><button data-p="ano">Ano</button></div>
-<p id="pdesc" class="empty"></p>
+<div class="seg pseg" id="pseg" role="group" aria-label="Período"><button data-p="1">Mês</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button><button data-p="12">12 meses</button><button data-p="ano">Ano</button></div>
+<p id="pdesc" class="empty" style="margin:-6px 2px 12px;font-size:13px"></p>
 <section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
 <section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
-<section class="card" id="ia-card">
-  <div class="lh" style="display: flex; justify-content: space-between; align-items: center;">
-    <h2 style="margin: 0;">Leitura (IA)</h2>
-    <div style="display: flex; gap: 8px;"><button class="s sm" id="ia-toggle" style="display: none;">Ocultar</button><button class="s sm" id="ia-gen">Gerar</button></div>
-  </div>
-  <div id="ia-out" style="margin-top: 12px;"><p class="empty">A IA lê os fatos.</p></div>
-</section>
-<section class="card" id="ia-chat-card">
-  <div class="lh"><h2>Pergunte ao seu dinheiro</h2><button class="s sm" id="ia-open">Abrir conversa</button></div>
-</section>
-<section class="card"><h2>Onde ajustar</h2><div id="cuts"></div></section>
+<section class="card"><h2>Onde ajustar primeiro</h2><div id="cuts"></div></section>
 <section class="card"><h2>Destaques</h2><ul id="hl" class="hl"></ul></section>
-<section class="card"><h2 id="comp-t">Composição</h2><div id="comp"></div></section>
+<section class="card"><h2 id="comp-t">Composição do mês</h2><div id="comp"></div></section>
 <details class="card more" id="mg"><summary>Ver mais gráficos</summary><div class="mgc">
-<section class="sub"><h2 id="cat-t">Categorias</h2><div id="catbars"></div></section>
-<section class="sub"><h2>Ritmo</h2><div id="pace"></div><div class="cv" id="pacecv"><canvas id="c4"></canvas></div><p id="pacenote" class="empty"></p></section>
-<section class="sub"><h2 id="projt">Projeção</h2><div class="cv"><canvas id="c2"></canvas></div><p id="projmsg"></p><p class="empty">Teto: <span id="tt">70</span>%.</p></section>
-<section class="sub"><h2>Parcelas</h2><div id="tl"></div></section>
-<section class="sub"><h2>Análise</h2><ul id="ins"></ul></section>
+<section class="sub"><h2 id="cat-t">Gastos por categoria</h2><div id="catbars"></div></section>
+<section class="sub"><h2>Ritmo do mês</h2><div id="pace"></div><div class="cv" id="pacecv"><canvas id="c4"></canvas></div><p id="pacenote" class="empty" style="margin:8px 0 0;font-size:13px"></p></section>
+<section class="sub"><h2 id="projt">Projeção dos próximos 12 meses</h2>
+<div class="cv"><canvas id="c2"></canvas></div>
+<p id="projmsg" style="margin:10px 0 4px"></p>
+<p class="empty" style="margin:0;font-size:13px">Faixa vermelha = mês acima do teto de <span id="tt">70</span>% da receita. Considera só o que já está lançado: fixos, parcelas e avulsos.</p></section>
+<section class="sub"><h2>Linha do tempo das parcelas</h2><div id="tl"></div></section>
+<section class="sub"><h2>Análise do mês</h2><ul id="ins"></ul></section>
 </div></details>
 <details class="card more" id="mt"><summary>Simulador e relatório</summary><div class="mgc">
 <section class="sub"><h2>E se eu comprar?</h2>
 <div class="fs">
-<div><label for="sv">Valor</label><input id="sv" inputmode="decimal"></div>
-<div><label for="sk">Tipo</label><select id="sk"><option value="t">Total</option><option value="p">Parcela</option></select></div>
+<div><label for="sv">Valor (R$)</label><input id="sv" inputmode="decimal" placeholder="Ex.: 2.400,00"></div>
+<div><label for="sk">Valor informado</label><select id="sk"><option value="t">Total da compra</option><option value="p">Por parcela</option></select></div>
 <div><label for="sn">Parcelas</label><input id="sn" type="number" min="1" max="72" value="1"></div>
-<div><label for="ss">Mês</label><input id="ss" type="month"></div>
+<div><label for="ss">Primeira parcela em</label><input id="ss" type="month"></div>
 </div>
 <div id="sr" style="margin-top:14px"></div>
-<div class="cv"><canvas id="c3"></canvas></div>
+<div class="cv" style="margin-top:12px"><canvas id="c3"></canvas></div>
 </section>
-<section class="sub"><h2>Relatório</h2><div class="exp"><button id="xr">Relatório do mês</button><button id="xp" hidden>Resumo do período</button><button class="s" id="xm">CSV mês</button><button class="s" id="xa">CSV completo</button><button class="s" id="xs">CSV resumo</button></div></section>
+<section class="sub"><h2>Relatório e exportação</h2><p class="empty" style="margin:-6px 0 12px">Resumo visual do mês (imagem ou PDF) e planilhas .csv que abrem no Excel e no Google Planilhas.</p>
+<div class="exp"><button id="xr">Relatório do mês</button><button id="xp" hidden>Resumo do período</button><button class="s" id="xm">Planilha do mês</button><button class="s" id="xa">Planilha completa</button><button class="s" id="xs">Resumo por mês</button></div></section>
 </div></details>
 </div>
 
 <div class="pane" id="pane-op" hidden>
 <section class="card"><div id="cfgc"></div></section>
-<footer class="ft"><span>v<span id="ver"></span></span><span id="cst"></span><button class="lnk" id="upd">Atualizar versão</button></footer>
+<footer class="ft"><span>v<span id="ver"></span></span><span id="cst"></span><button class="lnk" id="upd" title="Baixa a versão mais recente do site. Seus dados não são apagados.">Atualizar versão</button></footer>
 </div>
 <datalist id="pp"></datalist><datalist id="nms"></datalist>
 </main>
 
-<nav class="tabs">
-<button data-tab="in" class="on"><span>Início</span></button>
-<button data-tab="gs"><span>Gastos</span></button>
-<button class="plus" id="fab">+</button>
-<button data-tab="an"><span>Análises</span></button>
-<button data-tab="op"><span>Opções</span></button>
+<nav class="tabs" aria-label="Navegação">
+<button data-tab="in" class="on" aria-current="page"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Início</span></button>
+<button data-tab="gs"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg><span>Gastos</span></button>
+<button class="plus" id="fab" aria-label="Novo gasto">+</button>
+<button data-tab="an"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V11M10 20V4M16 20v-7M22 20H2"/></svg><span>Análises</span></button>
+<button data-tab="op"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg><span>Opções</span></button>
 </nav>
 
-<dialog id="qd"><div class="f"><div class="w lh"><h2>Novo gasto</h2><button type="button" class="s sm" id="qinc">+ Receita</button></div><div class="w"><label for="nm">Nome</label><input id="nm" list="nms"></div><div class="w"><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal"></div><p class="empty w" id="cth"></p><div class="w"><details id="mo"><summary>Mais opções</summary><div class="f"><div><label for="ct">Categoria</label><select id="ct"></select></div><div><label for="rc">Tipo</label><select id="rc"><option value="u">Única</option><option value="r">Recorrente</option></select></div><div><label for="np">Parcelas</label><input id="np" type="number" min="1" max="72" value="1"></div><div><label for="tp">Valor</label><select id="tp"><option value="p">Parcela</option><option value="t">Total</option></select></div><div class="w"><label for="st" id="stl">Mês</label><input id="st" type="month"></div><div class="w"><label for="dy">Dia</label><input id="dy" type="number" min="1" max="31"></div><div class="w"><label for="cd">Cartão</label><select id="cd"></select></div><div class="w" id="ncw" hidden><div class="cr"><input id="ncn" placeholder="Nome"><input id="ncd" type="number" placeholder="Venc."><button type="button" id="ncs">Salvar</button></div></div><div class="w"><label for="wh">De quem?</label><input id="wh" list="pp"></div></div></details></div><p id="msg" class="empty w"></p><div class="w" style="display:flex;gap:8px"><button id="ad" style="flex:1">Adicionar</button><button class="s" id="qx">Cancelar</button></div></div></dialog>
-<dialog id="dg"><div class="f"><div class="w"><h2 id="dt">Editar</h2></div><div class="w"><label for="en">Nome</label><input id="en"></div><div><label for="ec">Categoria</label><select id="ec"></select></div><div><label for="ev" id="evl">Valor</label><input id="ev" inputmode="decimal"></div><div class="w" id="npw"><label for="enp">Parcelas</label><input id="enp" type="number" min="1" max="72"></div><div class="w" id="npk" style="display:none"><label class="opt"><input type="radio" name="npm" value="p" checked> Manter parcela</label><label class="opt"><input type="radio" name="npm" value="t"> Manter total</label></div><div class="w"><label for="edy">Dia</label><input id="edy" type="number" min="1" max="31"></div><div class="w"><label for="ecd">Cartão</label><select id="ecd"></select></div><div class="w"><label for="ew">De quem?</label><input id="ew" list="pp"></div><div class="w" id="sc"><label>Aplicar</label><label class="opt"><input type="radio" name="scp" value="this" checked> Só este mês</label><label class="opt"><input type="radio" name="scp" value="next"> Este e os próximos</label><label class="opt"><input type="radio" name="scp" value="all"> Todos</label></div><p id="em" class="empty w"></p><div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="es">Salvar</button><button class="s" id="ee">Encerrar</button><button class="s" id="ex">Cancelar</button></div></div></dialog>
-<div id="selbar" hidden><span id="selc">0</span><button id="sela">Todos</button><button id="selp">Pagar</button><button id="selu">Pendente</button><button id="seld">Excluir</button><button id="selx">Cancelar</button></div>
-<dialog id="idg"><div class="f"><div class="w"><h2 id="idt">Nova receita</h2></div><div class="w"><label for="inm">Nome</label><input id="inm"></div><div><label for="ity">Tipo</label><select id="ity"></select></div><div><label for="ival">Valor (R$)</label><input id="ival" inputmode="decimal"></div><div><label for="ist">Mês</label><input id="ist" type="month"></div><div><label for="irc">Repete?</label><select id="irc"><option value="u">Só neste</option><option value="r">Todo mês</option></select></div><div class="w" id="iew" hidden><label for="ien">Até</label><input id="ien" type="month"></div><p id="imsg" class="empty w"></p><div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div></div></dialog>
-<dialog id="ob"><div class="f"><div class="w"><h2>Conhecendo você</h2></div><div><label for="oi">Sua renda é</label><select id="oi"></select></div><div><label for="of">Seu foco agora</label><select id="of"></select></div><div class="w"><label for="orv">Reserva atual</label><input id="orv" inputmode="decimal"></div><div class="w" style="display:flex;gap:8px"><button id="osv">Salvar</button><button class="s" id="odp">Depois</button></div></div></dialog>
-<dialog id="gdg"><div class="f"><div class="w"><h2 id="gdt">Nova meta</h2></div><div class="w"><label for="gnm">Nome</label><input id="gnm"></div><div><label for="gtg">Valor (R$)</label><input id="gtg" inputmode="decimal"></div><div><label for="gsv">Já guardado</label><input id="gsv" inputmode="decimal"></div><div class="w"><label for="gdl">Prazo</label><input id="gdl" type="month"></div><p id="gmsg" class="empty w"></p><div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="gsave">Salvar</button><button class="s" id="gcancel">Cancelar</button><button class="s" id="gdel" hidden>Excluir</button></div></div></dialog>
-<dialog id="rm" class="sheet"><h2 id="rmt"></h2><div class="mlist"><button id="rm-edit">Editar</button><button id="rm-pay"></button><button id="rm-dup">Duplicar</button><button id="rm-del" class="s"></button><button id="rm-x" class="s">Fechar</button></div></dialog>
-<dialog id="rp" class="wide"><h2 id="rpt">Relatório</h2><img id="rpi" style="width:100%"><div class="cr"><button id="rpi2">PNG</button><button id="rpp">PDF</button></div><button class="s" id="rpx">Fechar</button></dialog>
+<dialog id="qd"><div class="f">
+<div class="w lh"><h2>Novo gasto</h2><button type="button" class="s sm" id="qinc">+ Receita</button></div>
+<div class="w"><label for="nm">Nome</label><input id="nm" list="nms" autocomplete="off" placeholder="Ex.: Gasolina, mercado, notebook"></div>
+<div class="w"><label for="vl">Valor (R$)</label><input id="vl" inputmode="decimal" placeholder="0,00"></div>
+<p class="empty w" id="cth" style="margin:0;font-size:13px"></p>
+<div class="w"><details id="mo"><summary>Mais opções</summary><div class="f" style="margin-top:10px">
+<div><label for="ct">Categoria</label><select id="ct"></select></div>
+<div><label for="rc">Tipo de gasto</label><select id="rc"><option value="u">Única ou parcelada</option><option value="r">Recorrente (todo mês)</option></select></div>
+<div><label for="np">Parcelas</label><input id="np" type="number" min="1" max="72" value="1"></div>
+<div><label for="tp">Valor informado</label><select id="tp"><option value="p">Por parcela</option><option value="t">Total da compra</option></select></div>
+<div class="w"><label for="st" id="stl">Primeira parcela em</label><input id="st" type="month"></div>
+<div class="w"><label for="dy">Dia do mês (opcional)</label><input id="dy" type="number" min="1" max="31" inputmode="numeric" placeholder="Ex.: 10"><p class="empty" style="margin:4px 0 0;font-size:13px">Usado no ritmo do mês. Em parcelas e fixos, é o dia da cobrança.</p></div>
+<div class="w"><label for="cd">Cartão</label><select id="cd"></select></div>
+<div class="w" id="ncw" hidden><div class="cr" style="grid-template-columns:1fr 84px auto"><input id="ncn" placeholder="Nome do cartão" aria-label="Nome do cartão"><input id="ncd" type="number" min="1" max="31" placeholder="Venc." aria-label="Dia do vencimento"><button type="button" id="ncs">Salvar</button></div><p class="empty" style="margin:0;font-size:13px">Venc. = dia do vencimento da fatura (opcional).</p></div>
+<div class="w"><label for="wh">De quem é o gasto?</label><input id="wh" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"><p class="empty" style="margin:4px 0 0;font-size:13px">Gastos de outras pessoas não entram nos seus totais.</p></div>
+</div></details></div>
+<p id="msg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px"><button id="ad" style="flex:1">Adicionar</button><button class="s" id="qx">Cancelar</button></div>
+</div></dialog>
+<dialog id="dg"><div class="f">
+<div class="w"><h2 id="dt">Editar gasto</h2></div>
+<div class="w"><label for="en">Nome</label><input id="en"></div>
+<div><label for="ec">Categoria</label><select id="ec"></select></div>
+<div><label for="ev" id="evl">Valor (R$)</label><input id="ev" inputmode="decimal"></div>
+<div class="w" id="npw"><label for="enp">Número de parcelas</label><input id="enp" type="number" min="1" max="72"></div>
+<div class="w" id="npk" style="display:none"><label class="opt"><input type="radio" name="npm" value="p" checked> Manter o valor de cada parcela</label>
+<label class="opt"><input type="radio" name="npm" value="t"> Manter o total e recalcular a parcela</label></div>
+<div class="w"><label for="edy">Dia do mês (opcional)</label><input id="edy" type="number" min="1" max="31" inputmode="numeric"></div>
+<div class="w"><label for="ecd">Cartão</label><select id="ecd"></select></div>
+<div class="w"><label for="ew">De quem é o gasto?</label><input id="ew" list="pp" placeholder="Vazio = meu, ou o nome da pessoa"></div>
+<div class="w" id="sc"><label>Aplicar a</label>
+<label class="opt"><input type="radio" name="scp" value="this" checked> Só este mês (<span id="s1"></span>)</label>
+<label class="opt"><input type="radio" name="scp" value="next"> Este e os próximos meses</label>
+<label class="opt"><input type="radio" name="scp" value="all"> Todos os meses, inclusive os anteriores</label></div>
+<p id="em" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="es">Salvar</button><button class="s" id="ee">Encerrar recorrência</button><button class="s" id="ex">Cancelar</button></div>
+</div></dialog>
+<div id="selbar" hidden><span id="selc">0 selecionados</span><button id="sela">Todos</button><button id="selp">Pagar</button><button id="selu">Pendente</button><button id="seld">Excluir</button><button id="selx">Cancelar</button></div>
+<dialog id="idg"><div class="f">
+<div class="w"><h2 id="idt" style="margin-top:0">Nova receita</h2></div>
+<div class="w"><label for="inm">Nome</label><input id="inm" autocomplete="off" placeholder="Ex.: 13º salário (1ª parcela), freela do site"></div>
+<div><label for="ity">Tipo</label><select id="ity"></select></div>
+<div><label for="ival">Valor (R$)</label><input id="ival" inputmode="decimal" placeholder="0,00"></div>
+<div><label for="ist">Mês</label><input id="ist" type="month"></div>
+<div><label for="irc">Repete?</label><select id="irc"><option value="u">Só neste mês</option><option value="r">Todo mês</option></select></div>
+<div class="w" id="iew" hidden><label for="ien">Repete até (opcional)</label><input id="ien" type="month"></div>
+<p id="imsg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="isv">Salvar</button><button class="s" id="ixx">Cancelar</button><button class="s" id="idel" hidden>Excluir</button></div>
+</div></dialog>
+<dialog id="ob"><div class="f">
+<div class="w"><h2 style="margin-top:0">Conhecendo você</h2><p class="empty" style="margin:0">Três respostas deixam os alertas e as metas mais certeiros. Leva 1 minuto e dá para mudar depois em Opções > Perfil financeiro.</p></div>
+<div><label for="oi">Sua renda é</label><select id="oi"></select></div>
+<div><label for="of">Seu foco agora</label><select id="of"></select></div>
+<div class="w"><label for="orv">Quanto você já tem de reserva? (R$)</label><input id="orv" inputmode="decimal" placeholder="0,00"></div>
+<div class="w" style="display:flex;gap:8px"><button id="osv">Salvar</button><button class="s" id="odp">Depois</button></div>
+</div></dialog>
+<dialog id="gdg"><div class="f">
+<div class="w"><h2 id="gdt" style="margin-top:0">Nova meta</h2></div>
+<div class="w"><label for="gnm">Nome</label><input id="gnm" autocomplete="off" placeholder="Ex.: Viagem, entrada do carro"></div>
+<div><label for="gtg">Valor da meta (R$)</label><input id="gtg" inputmode="decimal" placeholder="0,00"></div>
+<div><label for="gsv">Já guardado (R$)</label><input id="gsv" inputmode="decimal" placeholder="0,00"></div>
+<div class="w"><label for="gdl">Prazo (opcional)</label><input id="gdl" type="month"></div>
+<p id="gmsg" class="empty w" role="status" style="margin:0"></p>
+<div class="w" style="display:flex;gap:8px;flex-wrap:wrap"><button id="gsave">Salvar</button><button class="s" id="gcancel">Cancelar</button><button class="s" id="gdel" hidden>Excluir</button></div>
+</div></dialog>
+<dialog id="rm" class="sheet"><h2 id="rmt" style="margin-top:0"></h2><div class="mlist"><button id="rm-edit">Editar</button><button id="rm-pay"></button><button id="rm-dup">Duplicar neste mês</button><button id="rm-del" class="s"></button><button id="rm-x" class="s">Fechar</button></div></dialog>
+<dialog id="rp" class="wide"><h2 id="rpt" style="margin-top:0">Relatório do mês</h2><img id="rpi" alt="Relatório do mês" style="width:100%;border-radius:10px;border:1px solid var(--ln)"><div class="cr" style="grid-template-columns:1fr 1fr;margin-top:12px"><button id="rpi2">Imagem (PNG)</button><button id="rpp">PDF</button></div><button class="s" id="rpx" style="width:100%">Fechar</button></dialog>
 <dialog id="cld"><div id="cldc"></div></dialog>
-<dialog id="lk"><div class="lkc"><h2>PIN</h2><input id="lkp" type="password" inputmode="numeric" maxlength="6"><p id="lke"></p><button id="lkb">Entrar</button></div></dialog>
-<dialog id="ia-dlg" class="ia-dialog"><div class="ia-chat-wrapper"><header class="ia-header"><div><h2>Seu Dinheiro</h2><span class="ia-status">● Online</span></div><button class="s sm" id="ia-x">Fechar</button></header><div id="ia-msgs" class="ia-msgs"><div class="ia-msg a">Olá!</div></div><div class="ia-footer"><div class="ia-input-row"><input id="ia-in" placeholder="Pergunte algo..."><button id="ia-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button></div></div></div></dialog>
-
+<dialog id="lk"><div class="lkc"><img src="icons/icon-192.png" width="72" height="72" alt=""><h2>Controle financeiro</h2><p class="empty" style="margin:0">Digite seu PIN para abrir</p><input id="lkp" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"><p id="lke" role="alert" style="color:var(--bd);margin:0;min-height:1.5em"></p><button id="lkb">Entrar</button></div></dialog>
 <div id="toast" popover="manual" role="status"></div>
 <script defer src="js/version.js"></script>
 <script defer src="js/config.js"></script>
@@ -135,7 +184,6 @@
 <script defer src="js/decisoes.js"></script>
 <script defer src="js/diagnostico.js"></script>
 <script defer src="js/relatorio.js"></script>
-<script defer src="js/ia.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>
 <script defer src="js/lock.js"></script>
