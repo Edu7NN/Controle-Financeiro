@@ -5,13 +5,12 @@ const DECISION_DAYS={snooze:14,done:45};
 const dayStr=d=>d.getFullYear()+'-'+pad2(d.getMonth()+1)+'-'+pad2(d.getDate());
 const dayKey=()=>dayStr(new Date());
 const addDays=n=>{const d=new Date();return dayStr(new Date(d.getFullYear(),d.getMonth(),d.getDate()+n))};
-const brDate=iso=>iso.slice(8,10)+'/'+iso.slice(5,7)+'/'+iso.slice(0,4);
 
 /** Última decisão registrada para a chave de um alerta (ou null). */
 const decisionOf=k=>[...S.decisions].reverse().find(d=>d.k===k)||null;
 /** O alerta está oculto por decisão do usuário? ("done" e "snooze" expiram; "never" não.) */
 function hiddenByDecision(k){
-  if((prof().mute[k]||'')===todayKey())return true; /* ocultar do mês (versão 2.6) */
+  if((prof().mute[k]||'')===todayKey())return true; /* ocultar do mês */
   const d=decisionOf(k);
   if(!d||d.kind==='reset')return false;
   if(d.kind==='never')return true;
