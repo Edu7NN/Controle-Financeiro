@@ -221,3 +221,65 @@ function renderCuts(){
     :'<p class="empty">Sem gastos flexíveis ou de desejo para sugerir cortes. Ajuste o peso das categorias em Opções > Perfil financeiro.</p>';
   $('cuts').querySelectorAll('[data-cut]').forEach(b=>b.onclick=()=>{F.q='';F.who='';F.st='';F.cat=b.dataset.cut;VIEW='l';showTab('gs')});
 }
+
+
+// === INTEGRAÇÃO IA (CAMADA 3) ===
+window.buildIaFacts = function() {
+  try {
+    const tk = todayKey(), cur = typeof mesExibido === 'function' ? mesExibido() : tk, mm = monthMetrics(cur);
+    const metrics = { mes: cur, receita: mm.s, teto_pct: TETO * 100, teto_valor: mm.s * TETO, fixos: mm.fx, parcelas: mm.pc, avulsos: mm.av, gasto_total: mm.g, essencial: mm.ess, sobra: mm.s - mm.g };
+    const projecao = [];
+    for (let i = 0; i < 12; i++) { const m = add(tk, i), spend = projSpend(m); projecao.push({ mes: m, receita: sal(m), gasto_projetado: spend, teto: sal(m) * TETO, excede_teto: sal(m) > 0 && spend > sal(m) * TETO }); }
+    const rawAlerts = typeof diagnose === 'function' ? diagnose() : [];
+    const alertas = rawAlerts.map(a => ({ nivel: a.lv, chave: a.k, titulo: a.t, descricao: a.x, impacto_reais: a.imp }));
+    const terminam = [];
+    for (let i = 0; i < 12; i++) { const m = add(tk, i), fin = myRows(m).filter(q => !q.rec && q.n > 1 && q.k === q.n); if (fin.length) terminam.push({ mes: m, valor_libera: sumV(fin), descricoes: fin.map(q => q.name) }); }
+    const outras_pessoas = [];
+    if (typeof S !== 'undefined' && S.items) {
+      const per = {};
+      if (typeof monthsRange === 'function') {
+        monthsRange().forEach(m => rows(m).filter(q => q.who).forEach(q => {
+          const o = per[q.who] || (per[q.who] = { open: 0, late: 0, fut: 0, last: m, n: 0 });
+          if (num(m) <= num(tk)) { if (!S.paid[q.id + '|' + m]) { o.open += q.val; o.n++; if (num(m) < num(tk)) o.late += q.val; } } else { o.fut += q.val; if (num(m) > num(o.last)) o.last = m; }
+        }));
+      }
+      Object.entries(per).filter(([,o]) => o.open + o.fut > 0).forEach(([n, o]) => { outras_pessoas.push({ pessoa: n, total_aberto_ou_futuro: o.open + o.fut, pendente_atual: o.open, atrasado: o.late, futuro: o.fut, ultimo_mes: o.last }); });
+    }
+    const summary = typeof decisionSummary === 'function' ? decisionSummary() : {}, ri = typeof reserveInfo === 'function' ? reserveInfo() : {};
+    const metas = (S.goals || []).map(g => { const p = typeof goalPlan === 'function' ? goalPlan(g) : {}; return { nome: g.name, valor: g.target, guardado: g.saved, prazo: g.deadline, status: p.st, falta: p.left, precisa_por_mes: p.need, sobra_media: p.avg, data_realista: p.eta }; });
+    const categorias_fora_padrao = [], prevM = [1,2,3].map(i => add(cur, -i)).filter(m => tot(m) > 0);
+    if (prevM.length && mm.s > 0) {
+      const catAv = m => { const o={}; myRows(m).filter(q=>!q.rec&&q.n===1).forEach(q=>o[q.cat]=(o[q.cat]||0)+q.val); return o; }, now = catAv(cur), prev = prevM.map(catAv);
+      Object.keys(now).map(c=>({c, v: now[c], b: mean(prev.map(p=>p[c]||0))})).filter(z=>z.b>0 && z.v>=z.b*1.3 && z.v-z.b>=Math.max(50,mm.s*.02)).sort((a,b)=>(b.v-b.b)-(a.v-a.b)).slice(0,3).forEach(z => { categorias_fora_padrao.push({ categoria: z.c, valor_atual: z.v, media_anterior: z.b, variacao_pct: Math.round((z.v/z.b-1)*100) }); });
+    }
+    return { gerado_em: new Date().toISOString(), perfil: summary.perfil || {}, regras: summary.regras || {}, decisoes: summary.decisoes || {}, mes_atual: cur, metricas_mes: metrics, projecao_12_meses: projecao, alertas, parcelas_que_terminam: terminam, outras_pessoas, reserva: { valor_atual: ri.reserve, custo_essencial_mensal: ri.cost, alvo_meses: (summary.regras && summary.regras.reserve) || 6, alvo_valor: ri.target, meses_cobertos: Number(ri.cover ? ri.cover.toFixed(1) : 0), falta: ri.gap }, metas, categorias_fora_padrao };
+  } catch (e) { return { erro: "Falha ao ler dados locais", detalhes: String(e) }; }
+};
+
+window.simularCompra = function(args) {
+  try {
+    const tv = args.valor_total || (args.valor_parcela ? args.valor_parcela * args.parcelas : 0), n = Math.max(1, args.parcelas || 1);
+    let st = args.mes_inicio || (typeof mesExibido === 'function' ? mesExibido() : todayKey());
+    if (!sal(st)) { for (let i = 1; i <= 12; i++) { if (sal(add(st, i))) { st = add(st, i); break; } } }
+    if (!tv || tv <= 0) return { erro: "Valor inválido." };
+    if (!sal(st)) return { erro: "Sem receita cadastrada. Informe o salário em Início > Detalhes e receitas." };
+
+    const total = tv, val = Math.round(total / n * 100) / 100;
+    const cost = m => { const d = num(m) - num(st); return d >= 0 && d < n ? val : 0; };
+    const fits = (s0, k) => { const v = total / k; for (let i = 0; i < k; i++) { const m = add(s0, i), s = sal(m); if (!s || tot(m) + v > TETO * s) return false; } return true; };
+    const aff = Array.from({ length: n }, (_, i) => add(st, i)).filter(m => sal(m) > 0);
+    const ratio = m => (tot(m) + cost(m)) / sal(m), over = aff.filter(m => ratio(m) > TETO), peak = aff.reduce((a, m) => ratio(m) > ratio(a) ? m : a, aff[0]);
+    const ok = !over.length, pk = Math.round(ratio(peak) * 100), lv = ok ? (pk > TETO * 100 - 10 ? 'warn' : 'ok') : 'bad';
+    let title = ok ? (pk > TETO * 100 - 10 ? 'Pode comprar, mas apertado' : 'Pode comprar') : 'Melhor não parcelar assim';
+    let detail = ok ? 'Nenhum mês passa do teto de ' + Math.round(TETO * 100) + '%. O pior mês, ' + lab(peak) + ', fica em ' + pk + '% da receita.' : over.length + (over.length > 1 ? ' meses passam' : ' mês passa') + ' do teto de ' + Math.round(TETO * 100) + '%, com pico de ' + pk + '% em ' + lab(peak) + '.';
+    const L = [];
+    if (!ok) {
+      let n2 = 0; for (let k = 1; k <= 24; k++) if (fits(st, k)) { n2 = k; break; }
+      let w = -1; for (let s = 0; s <= 12; s++) if (fits(add(st, s), n)) { w = s; break; }
+      L.push(n2 ? 'Parcelando em ' + n2 + '× de ' + R(total / n2) + ', nenhum mês passa do teto.' : 'Nem em 24× a compra cabe no teto.');
+      L.push(w > 0 ? 'Esperando até ' + lab(add(st, w)) + ', a compra em ' + n + '× cabe no teto.' : 'Esperar não resolve nos próximos 12 meses.');
+    }
+    if (n > 1) { const av = (tot(st) + total) / sal(st); L.push('À vista em ' + lab(st) + ': o mês iria a ' + Math.round(av * 100) + '% da receita' + (av <= TETO ? ', ainda dentro do teto.' : ', acima do teto.')); }
+    return { pode_comprar: ok, nivel: lv, veredicto: title, detalhe: detail, pior_mes: peak, pior_mes_ratio: pk, impacto_mensal: val, total: total, meses_afetados: n, sugestoes: L };
+  } catch (e) { return { erro: String(e) }; }
+};
