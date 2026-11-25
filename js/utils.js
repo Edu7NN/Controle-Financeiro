@@ -1,10 +1,10 @@
 /* Utilitários: formatação, datas, mensagens */
+window.PRIV = window.PRIV || false; // Garante que a variável global exista antes de tudo
+
 const MN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
 const $=id=>document.getElementById(id);
-
-// PROTEÇÃO CONTRA DADOS CORROMPIDOS
+const R=v=>(window.PRIV?'R$ ••••':v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
 const num=m=>{if(!m||typeof m!=='string'||!m.includes('-'))return 0;const[y,mo]=m.split('-').map(Number);return (y||0)*12+(mo||1)-1};
-
 const add=(m,n)=>{const t=num(m)+n;return Math.floor(t/12)+'-'+String(t%12+1).padStart(2,'0')};
 const lab=m=>{if(!m||!m.includes('-'))return'';return MN[+m.slice(5)-1]+' '+m.slice(0,4)};
 const sh=m=>{if(!m||!m.includes('-'))return'';return MN[+m.slice(5)-1].slice(0,3)+'/'+m.slice(2,4)};
@@ -13,7 +13,6 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const cssv=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
 const pnum=s=>parseFloat(String(s).replace(/\./g,'').replace(',','.'));
-const R=v=>(window.PRIV?'R$ ••••':v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}));
 
 let toastT=null;
 const TOAST_MS={plain:3000,undo:5000};
