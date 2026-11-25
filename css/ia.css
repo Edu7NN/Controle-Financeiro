@@ -1,347 +1,44 @@
-/* =========================================================
-   CHAT DA IA - BLINDADO E RESPONSIVO (MOBILE E DESKTOP)
-   ========================================================= */
-
-/* 1. O Container Principal */
-#ia-dlg {
-  padding: 0 !important;
-  border: none !important;
-  background: transparent !important;
-  max-width: 100% !important;
-  max-height: 100% !important;
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  overflow: hidden !important;
-}
-
-#ia-dlg::backdrop {
-  background: rgba(0, 0, 0, 0.7) !important;
-  backdrop-filter: blur(3px) !important;
-}
-
-#ia-dlg .ia-chat-wrapper {
-  display: flex !important;
-  flex-direction: column !important;
-  background: var(--bg, #0d1b1a) !important;
-  width: 100% !important;
-  height: 100dvh !important;
-  box-sizing: border-box !important;
-}
-
-/* 2. Layout de Computador (Modal Centralizado) */
+#ia-dlg { padding: 0 !important; border: none !important; background: transparent !important; max-width: 100% !important; max-height: 100% !important; width: 100% !important; height: 100% !important; margin: 0 !important; overflow: hidden !important; }
+#ia-dlg::backdrop { background: rgba(0, 0, 0, 0.7) !important; backdrop-filter: blur(3px) !important; }
+#ia-dlg .ia-chat-wrapper { display: flex !important; flex-direction: column !important; background: var(--bg, #0d1b1a) !important; width: 100% !important; height: 100dvh !important; box-sizing: border-box !important; }
 @media (min-width: 600px) {
-  #ia-dlg {
-    max-width: 480px !important;
-    max-height: 80vh !important;
-    height: 80vh !important;
-    margin: auto !important;
-    border-radius: 16px !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important;
-    border: 1px solid var(--ln, #2a3a36) !important;
-  }
-  #ia-dlg .ia-chat-wrapper {
-    height: 100% !important;
-    border-radius: 16px !important;
-  }
+  #ia-dlg { max-width: 480px !important; max-height: 80vh !important; height: 80vh !important; margin: auto !important; border-radius: 16px !important; box-shadow: 0 10px 40px rgba(0,0,0,0.8) !important; border: 1px solid var(--ln, #2a3a36) !important; }
+  #ia-dlg .ia-chat-wrapper { height: 100% !important; border-radius: 16px !important; }
 }
-
-/* 3. Cabeçalho (Forçando lado a lado) */
-#ia-dlg .ia-header {
-  display: flex !important;
-  flex-direction: row !important;
-  justify-content: space-between !important;
-  align-items: center !important;
-  padding: 16px 20px !important;
-  background: var(--card, #12201e) !important;
-  border-bottom: 1px solid var(--ln, #2a3a36) !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-}
-
-#ia-dlg .ia-header > div {
-  display: flex !important;
-  flex-direction: column !important;
-  justify-content: center !important;
-}
-
-#ia-dlg .ia-header h2 {
-  margin: 0 0 2px 0 !important;
-  font-size: 18px !important;
-  font-weight: 700 !important;
-  color: var(--ink, #fff) !important;
-  line-height: 1.2 !important;
-}
-
-#ia-dlg .ia-header .ia-status {
-  font-size: 12px !important;
-  color: #4ade80 !important;
-  display: block !important;
-  line-height: 1 !important;
-}
-
-/* Força o botão Fechar a ficar pequeno e no canto */
-#ia-dlg .ia-header button.ia-close {
-  width: auto !important;
-  min-width: 70px !important;
-  margin: 0 !important;
-  padding: 8px 16px !important;
-  background: transparent !important;
-  border: 1px solid var(--ln, #2a3a36) !important;
-  color: var(--ink, #fff) !important;
-  border-radius: 8px !important;
-  font-size: 13px !important;
-  cursor: pointer !important;
-  display: inline-block !important;
-  flex-shrink: 0 !important;
-}
-
-/* 4. Área de Mensagens */
-#ia-dlg .ia-msgs {
-  flex-grow: 1 !important;
-  overflow-y: auto !important;
-  padding: 20px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  gap: 16px !important; /* Espaçamento entre as mensagens */
-  scroll-behavior: smooth !important;
-  margin: 0 !important;
-}
-
-#ia-dlg .ia-msg {
-  max-width: 88% !important;
-  padding: 14px 18px !important;
-  border-radius: 16px !important;
-  font-size: 15px !important;
-  line-height: 1.5 !important;
-  white-space: pre-wrap !important;
-  word-wrap: break-word !important;
-  display: block !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important;
-}
-
-#ia-dlg .ia-msg.u {
-  align-self: flex-end !important;
-  background: #0A3B34 !important;
-  color: #fff !important;
-  border-bottom-right-radius: 4px !important;
-}
-
-#ia-dlg .ia-msg.a {
-  align-self: flex-start !important;
-  background: var(--card, #1c2a27) !important;
-  color: var(--ink, #e6ecea) !important;
-  border-bottom-left-radius: 4px !important;
-  border: 1px solid var(--ln, #2a3a36) !important;
-}
-
-#ia-dlg .ia-msg.s {
-  align-self: center !important;
-  font-size: 12px !important;
-  color: var(--mu, #888) !important;
-  background: transparent !important;
-  text-align: center !important;
-  padding: 4px !important;
-  box-shadow: none !important;
-}
-
-/* Indicador de "Digitando..." */
-#ia-dlg .typing-indicator {
-  display: flex !important;
-  gap: 4px !important;
-  padding: 16px !important;
-  align-self: flex-start !important;
-  background: var(--card, #1c2a27) !important;
-  border-radius: 16px !important;
-  border-bottom-left-radius: 4px !important;
-  border: 1px solid var(--ln, #2a3a36) !important;
-  margin: 0 !important;
-}
-
-#ia-dlg .typing-indicator span {
-  width: 6px !important;
-  height: 6px !important;
-  background: var(--mu, #888) !important;
-  border-radius: 50% !important;
-  animation: bounce 1.4s infinite ease-in-out both !important;
-}
-
+#ia-dlg .ia-header { display: flex !important; flex-direction: row !important; justify-content: space-between !important; align-items: center !important; padding: 16px 20px !important; background: var(--sf, #12201e) !important; border-bottom: 1px solid var(--ln, #2a3a36) !important; flex-shrink: 0 !important; margin: 0 !important; }
+#ia-dlg .ia-header > div { display: flex !important; flex-direction: column !important; justify-content: center !important; }
+#ia-dlg .ia-header h2 { margin: 0 0 2px 0 !important; font-size: 18px !important; font-weight: 700 !important; color: var(--ink, #fff) !important; line-height: 1.2 !important; }
+#ia-dlg .ia-header .ia-status { font-size: 12px !important; color: #4ade80 !important; display: block !important; line-height: 1 !important; }
+#ia-dlg .ia-header button.ia-close { width: auto !important; min-width: 70px !important; margin: 0 !important; padding: 8px 16px !important; background: transparent !important; border: 1px solid var(--ln, #2a3a36) !important; color: var(--ink, #fff) !important; border-radius: 8px !important; font-size: 13px !important; cursor: pointer !important; flex-shrink: 0 !important; }
+#ia-dlg .ia-msgs { flex-grow: 1 !important; overflow-y: auto !important; padding: 20px !important; display: flex !important; flex-direction: column !important; gap: 16px !important; scroll-behavior: smooth !important; margin: 0 !important; }
+#ia-dlg .ia-msg { max-width: 88% !important; padding: 14px 18px !important; border-radius: 16px !important; font-size: 15px !important; line-height: 1.5 !important; white-space: pre-wrap !important; word-wrap: break-word !important; display: block !important; margin: 0 !important; box-sizing: border-box !important; box-shadow: 0 2px 5px rgba(0,0,0,0.1) !important; }
+#ia-dlg .ia-msg.u { align-self: flex-end !important; background: var(--ac, #0A3B34) !important; color: #fff !important; border-bottom-right-radius: 4px !important; }
+#ia-dlg .ia-msg.a { align-self: flex-start !important; background: var(--sf, #1c2a27) !important; color: var(--ink, #e6ecea) !important; border-bottom-left-radius: 4px !important; border: 1px solid var(--ln, #2a3a36) !important; }
+#ia-dlg .ia-msg.s { align-self: center !important; font-size: 12px !important; color: var(--mu, #888) !important; background: transparent !important; text-align: center !important; padding: 4px !important; box-shadow: none !important; }
+#ia-dlg .typing-indicator { display: flex !important; gap: 4px !important; padding: 16px !important; align-self: flex-start !important; background: var(--sf, #1c2a27) !important; border-radius: 16px !important; border-bottom-left-radius: 4px !important; border: 1px solid var(--ln, #2a3a36) !important; margin: 0 !important; }
+#ia-dlg .typing-indicator span { width: 6px !important; height: 6px !important; background: var(--mu, #888) !important; border-radius: 50% !important; animation: bounce 1.4s infinite ease-in-out both !important; }
 #ia-dlg .typing-indicator span:nth-child(1) { animation-delay: -0.32s !important; }
 #ia-dlg .typing-indicator span:nth-child(2) { animation-delay: -0.16s !important; }
-
-@keyframes bounce {
-  0%, 80%, 100% { transform: scale(0); }
-  40% { transform: scale(1); }
-}
-
-/* 5. Rodapé e Campo de Digitação (Forçando lado a lado) */
-#ia-dlg .ia-footer {
-  padding: 16px 20px !important;
-  padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
-  background: var(--card, #12201e) !important;
-  border-top: 1px solid var(--ln, #2a3a36) !important;
-  flex-shrink: 0 !important;
-  margin: 0 !important;
-}
-
-/* Força a linha a ser flex e alinhar itens ao centro */
-#ia-dlg .ia-input-row {
-  display: flex !important;
-  flex-direction: row !important;
-  gap: 12px !important;
-  align-items: center !important;
-  width: 100% !important;
-  margin: 0 !important;
-}
-
-/* O input ocupa o espaço restante, mas não joga o botão pra fora */
-#ia-dlg .ia-input-row input {
-  flex-grow: 1 !important;
-  flex-shrink: 1 !important;
-  width: 100% !important;
-  min-width: 0 !important;
-  background: var(--bg, #0d1b1a) !important;
-  border: 1px solid var(--ln, #2a3a36) !important;
-  color: var(--ink, #fff) !important;
-  padding: 14px 18px !important;
-  border-radius: 24px !important;
-  font-size: 15px !important;
-  outline: none !important;
-  margin: 0 !important;
-  box-sizing: border-box !important;
-}
-
-#ia-dlg .ia-input-row input:focus {
-  border-color: #0A3B34 !important;
-}
-
-/* O botão de enviar fica fixo e redondo */
-#ia-dlg .ia-input-row button {
-  width: 48px !important;
-  height: 48px !important;
-  min-width: 48px !important;
-  border-radius: 50% !important;
-  background: #0A3B34 !important;
-  color: #fff !important;
-  border: none !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  cursor: pointer !important;
-  flex-shrink: 0 !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  transition: transform 0.1s, background 0.2s !important;
-}
-
-#ia-dlg .ia-input-row button svg {
-  width: 20px !important;
-  height: 20px !important;
-  transform: translateX(-2px) translateY(1px) !important; /* Centraliza o ícone */
-}
-
-#ia-dlg .ia-input-row button:active {
-  transform: scale(0.92) !important;
-}
-
-#ia-dlg .ia-input-row button:disabled {
-  background: var(--ln, #2a3a36) !important;
-  color: var(--mu, #888) !important;
-  cursor: not-allowed !important;
-}
-
-#ia-dlg .ia-disclaimer {
-  text-align: center !important;
-  font-size: 11px !important;
-  color: var(--mu, #888) !important;
-  margin: 12px 0 0 0 !important;
-  padding: 0 !important;
-  line-height: 1.2 !important;
-}
-
-/* =========================================================
-   6. ESTILOS DA LEITURA DO MÊS (IA) - CARDS E CORES
-   ========================================================= */
-.ia-resumo {
-  font-size: 15px;
-  line-height: 1.5;
-  margin: 0 0 16px;
-  color: var(--ink, #eee);
-}
-
-.ia-pri-card {
-  background: var(--card, #12201e);
-  border: 1px solid var(--ln, #2a3a36);
-  border-left: 4px solid #ffb020;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.ia-pri-card h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  font-weight: 700;
-  color: #fff;
-}
-
-.ia-pri-desc {
-  font-size: 14px;
-  line-height: 1.5;
-  margin: 0 0 16px;
-  color: var(--ink, #ccc);
-}
-
-.ia-meta-box {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  background: rgba(0, 0, 0, 0.2);
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 16px;
-}
-
-.ia-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  min-width: 80px;
-}
-
-.ia-meta-item span {
-  font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--mu, #888);
-}
-
-.ia-meta-item strong {
-  font-size: 13px;
-  color: var(--ink, #fff);
-}
-
-.ia-hl-money { color: #4ade80; font-weight: 700; }
-.ia-hl-date { color: #60a5fa; font-weight: 600; }
-
-.ia-act {
-  display: inline-block;
-  width: 100%;
-  padding: 12px 16px;
-  background: var(--ac, #0A3B34);
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  text-align: center;
-  transition: background 0.2s, transform 0.1s;
-}
-
-.ia-act:hover { background: #0c4a41; }
+@keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+#ia-dlg .ia-footer { padding: 16px 20px !important; padding-bottom: max(16px, env(safe-area-inset-bottom)) !important; background: var(--sf, #12201e) !important; border-top: 1px solid var(--ln, #2a3a36) !important; flex-shrink: 0 !important; margin: 0 !important; }
+#ia-dlg .ia-input-row { display: flex !important; flex-direction: row !important; gap: 12px !important; align-items: center !important; width: 100% !important; margin: 0 !important; }
+#ia-dlg .ia-input-row input { flex-grow: 1 !important; flex-shrink: 1 !important; width: 100% !important; min-width: 0 !important; background: var(--bg, #0d1b1a) !important; border: 1px solid var(--ln, #2a3a36) !important; color: var(--ink, #fff) !important; padding: 14px 18px !important; border-radius: 24px !important; font-size: 15px !important; outline: none !important; margin: 0 !important; box-sizing: border-box !important; }
+#ia-dlg .ia-input-row input:focus { border-color: var(--ac, #0A3B34) !important; }
+#ia-dlg .ia-input-row button { width: 48px !important; height: 48px !important; min-width: 48px !important; border-radius: 50% !important; background: var(--ac, #0A3B34) !important; color: #fff !important; border: none !important; display: flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; flex-shrink: 0 !important; padding: 0 !important; margin: 0 !important; transition: transform 0.1s, background 0.2s !important; }
+#ia-dlg .ia-input-row button svg { width: 20px !important; height: 20px !important; transform: translateX(-2px) translateY(1px) !important; }
+#ia-dlg .ia-input-row button:active { transform: scale(0.92) !important; }
+#ia-dlg .ia-input-row button:disabled { background: var(--ln, #2a3a36) !important; color: var(--mu, #888) !important; cursor: not-allowed !important; }
+#ia-dlg .ia-disclaimer { text-align: center !important; font-size: 11px !important; color: var(--mu, #888) !important; margin: 12px 0 0 0 !important; padding: 0 !important; line-height: 1.2 !important; }
+.ia-resumo { font-size: 15px; line-height: 1.5; margin: 0 0 16px; color: var(--ink, #eee); }
+.ia-pri-card { background: var(--sf, #12201e); border: 1px solid var(--ln, #2a3a36); border-left: 4px solid var(--wn, #ffb020); border-radius: 8px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.ia-pri-card h3 { margin: 0 0 8px; font-size: 16px; font-weight: 700; color: var(--ink, #fff); }
+.ia-pri-desc { font-size: 14px; line-height: 1.5; margin: 0 0 16px; color: var(--ink, #ccc); }
+.ia-meta-box { display: flex; flex-wrap: wrap; gap: 12px; background: rgba(0, 0, 0, 0.2); padding: 12px; border-radius: 6px; margin-bottom: 16px; }
+.ia-meta-item { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 80px; }
+.ia-meta-item span { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--mu, #888); }
+.ia-meta-item strong { font-size: 13px; color: var(--ink, #fff); }
+.ia-hl-money { color: var(--ok, #4ade80); font-weight: 700; }
+.ia-hl-date { color: var(--ac, #60a5fa); font-weight: 600; }
+.ia-act { display: inline-block; width: 100%; padding: 12px 16px; background: var(--ac, #0A3B34); color: #fff; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer; text-align: center; transition: background 0.2s, transform 0.1s; }
+.ia-act:hover { background: color-mix(in srgb, var(--ac, #0A3B34) 80%, black); }
 .ia-act:active { transform: scale(0.98); }
