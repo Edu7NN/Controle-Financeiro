@@ -56,6 +56,15 @@
       const res = await IA.call({ mode: "leitura", facts });
       localStorage.setItem(key, JSON.stringify(res.leitura));
       IA.renderLeitura(res.leitura, res.usage);
+      
+      // Mostra o botão de ocultar
+      const toggleBtn = $("#ia-toggle");
+      if (toggleBtn) {
+        toggleBtn.style.display = "inline-block";
+        toggleBtn.textContent = "Ocultar";
+      }
+      out.style.display = "block";
+      
     } catch (e) { out.innerHTML = '<p class="empty" style="color:var(--bd)">' + esc(e.message) + "</p>"; }
   };
 
@@ -108,8 +117,27 @@
     const x = $("#ia-x"); if (x) x.addEventListener("click", () => $("#ia-dlg")?.close());
     const send = $("#ia-send"); if (send) send.addEventListener("click", () => IA.enviarChat($("#ia-in")?.value));
     const inp = $("#ia-in"); if (inp) inp.addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); IA.enviarChat(inp.value); } });
-    let mes = new Date().toISOString().slice(0, 7); try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
-    const cache = localStorage.getItem("ia.leitura." + mes); if (cache && $("#ia-out")) { try { IA.renderLeitura(JSON.parse(cache)); } catch {} }
+    
+    // Lógica do botão Ocultar/Mostrar Leitura
+    const toggleBtn = $("#ia-toggle");
+    const outDiv = $("#ia-out");
+    if (toggleBtn && outDiv) {
+      toggleBtn.addEventListener("click", () => {
+        const isHidden = outDiv.style.display === "none";
+        outDiv.style.display = isHidden ? "block" : "none";
+        toggleBtn.textContent = isHidden ? "Ocultar" : "Mostrar";
+      });
+    }
+
+    let mes = new Date().toISOString().slice(0, 7); 
+    try { if (typeof window.mesExibido === 'function') mes = window.mesExibido(); } catch {}
+    const cache = localStorage.getItem("ia.leitura." + mes); 
+    if (cache && outDiv) { 
+      try { 
+        IA.renderLeitura(JSON.parse(cache)); 
+        if (toggleBtn) toggleBtn.style.display = "inline-block";
+      } catch {} 
+    }
   };
   document.addEventListener("DOMContentLoaded", IA.init);
 })();
