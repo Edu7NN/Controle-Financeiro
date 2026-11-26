@@ -13,7 +13,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <script src="vendor/chart.umd.js"></script>
 <link rel="stylesheet" href="css/styles.css">
-<!-- NOVO: Estilo do Chat da IA -->
 <link rel="stylesheet" href="css/ia.css">
 </head>
 <body><main>
@@ -53,16 +52,23 @@
 <section class="card"><h2>Painel de saúde</h2><div id="pnl"></div></section>
 <section class="card" id="alr-card"><h2>Alertas e prioridades</h2><div id="alr"></div></section>
 
-<!-- NOVO: Cartões da IA -->
 <section class="card" id="ia-card">
-  <div class="lh"><h2>Leitura do mês (IA)</h2><button class="s sm" id="ia-gen">Gerar</button></div>
-  <div id="ia-out" style="margin-top: 12px;"><p class="empty">Sob demanda: a IA lê os fatos calculados e devolve até 3 prioridades ordenadas por impacto.</p></div>
+  <div class="lh" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+    <h2 style="margin: 0;">Leitura do mês (IA)</h2>
+    <div style="display: flex; gap: 8px;">
+      <button class="s sm" id="ia-toggle" style="display: none;">Ocultar</button>
+      <button class="s sm" id="ia-gen">Gerar</button>
+    </div>
+  </div>
+  <div id="ia-out" style="margin-top: 12px;">
+    <p class="empty" style="margin:0; font-size: 13px;">Sob demanda: a IA lê os fatos já calculados e devolve até 3 prioridades ordenadas por impacto em reais. Nada é enviado até você clicar.</p>
+  </div>
 </section>
+
 <section class="card" id="ia-chat-card">
   <div class="lh"><h2>Pergunte ao seu dinheiro</h2><button class="s sm" id="ia-open">Abrir conversa</button></div>
   <p class="empty" style="margin:0">Ex.: "posso comprar um celular de R$ 2.400 em 10x?" — a IA usa o simulador que você já tem e comenta o resultado.</p>
 </section>
-<!-- FIM NOVO -->
 
 <section class="card"><h2>Onde ajustar primeiro</h2><div id="cuts"></div></section>
 <section class="card"><h2>Destaques</h2><ul id="hl" class="hl"></ul></section>
@@ -178,7 +184,6 @@
 <dialog id="cld"><div id="cldc"></div></dialog>
 <dialog id="lk"><div class="lkc"><img src="icons/icon-192.png" width="72" height="72" alt=""><h2>Controle financeiro</h2><p class="empty" style="margin:0">Digite seu PIN para abrir</p><input id="lkp" type="password" inputmode="numeric" maxlength="6" autocomplete="off" aria-label="PIN"><p id="lke" role="alert" style="color:var(--bd);margin:0;min-height:1.5em"></p><button id="lkb">Entrar</button></div></dialog>
 
-<!-- NOVO: Modal do Chat da IA -->
 <dialog id="ia-dlg" class="ia-dialog">
   <div class="ia-chat-wrapper">
     <header class="ia-header"><div><h2>Seu Dinheiro</h2><span class="ia-status">● Online (Gemini)</span></div><button class="s sm ia-close" id="ia-x">Fechar</button></header>
@@ -186,7 +191,6 @@
     <div class="ia-footer"><div class="ia-input-row"><input id="ia-in" placeholder="Pergunte algo..."><button id="ia-send"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button></div><p class="ia-disclaimer">A IA recebe só um resumo agregado.</p></div>
   </div>
 </dialog>
-<!-- FIM NOVO -->
 
 <div id="toast" popover="manual" role="status"></div>
 <script defer src="js/version.js"></script>
@@ -209,7 +213,7 @@
 <script defer src="js/decisoes.js"></script>
 <script defer src="js/diagnostico.js"></script>
 <script defer src="js/relatorio.js"></script>
-<script defer src="js/ia.js"></script> <!-- NOVO: Script da IA -->
+<script defer src="js/ia.js"></script>
 <script defer src="js/backup.js"></script>
 <script defer src="js/cloud.js"></script>
 <script defer src="js/lock.js"></script>
