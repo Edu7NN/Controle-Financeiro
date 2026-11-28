@@ -382,6 +382,22 @@
     align-items: center !important;
     flex: none !important; /* Impede de tentar dividir o espaço igualmente */
   }
+
+   /* Estilos para as respostas formatadas da IA */
+#ia-dlg .ia-msg.a strong {
+  color: var(--ink, #fff); /* Deixa o negrito mais branco/brilhante */
+  font-weight: 800;
+}
+
+#ia-dlg .ia-msg.a em {
+  color: var(--mu, #888);
+}
+
+#ia-dlg .ia-msg.a br {
+  content: "";
+  display: block;
+  margin-bottom: 6px; /* Dá um respiro entre as linhas */
+}
   
   .ia-meta-item span {
     margin: 0 !important;
