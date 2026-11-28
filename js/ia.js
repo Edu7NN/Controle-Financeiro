@@ -6,6 +6,16 @@
   const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   const fmt = (n) => (Number(n) || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 
+  // NOVO: Função para formatar o Markdown básico da IA em HTML seguro
+  function formatarTextoIA(texto) {
+    if (!texto) return "";
+    let html = esc(texto);
+    html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>'); // Negrito
+    html = html.replace(/\*(.*?)\*/g, '<em>$1</em>'); // Itálico
+    html = html.replace(/\n/g, '<br>'); // Quebra de linha
+    return html;
+  }
+
   const cfg = () => {
     const u = typeof SUPABASE_URL !== 'undefined' ? SUPABASE_URL : (window.SUPABASE_URL || "");
     const k = typeof SUPABASE_KEY !== 'undefined' ? SUPABASE_KEY : (window.SUPABASE_KEY || window.SUPABASE_ANON || "");
@@ -88,7 +98,21 @@
   IA.enviarChat = async function (texto) {
     texto = String(texto || "").trim(); if (!texto) return;
     const msgs = $("#ia-msgs"); if (!msgs) return;
-    const add = (role, txt) => { const b = document.createElement("div"); b.className = "ia-msg " + (role === "user" ? "u" : role === "assistant" ? "a" : "s"); b.textContent = txt; msgs.appendChild(b); msgs.scrollTop = msgs.scrollHeight; return b; };
+    
+    // ALTERAÇÃO AQUI: Aplica a formatação HTML apenas nas mensagens da IA
+    const add = (role, txt) => { 
+      const b = document.createElement("div"); 
+      b.className = "ia-msg " + (role === "user" ? "u" : role === "assistant" ? "a" : "s"); 
+      if (role === "assistant") {
+        b.innerHTML = formatarTextoIA(txt); 
+      } else {
+        b.textContent = txt; 
+      }
+      msgs.appendChild(b); 
+      msgs.scrollTop = msgs.scrollHeight; 
+      return b; 
+    };
+
     add("user", texto); IA.hist.push({ role: "user", content: texto });
     const input = $("#ia-in"); if (input) input.value = "";
     const btn = $("#ia-send"); if (btn) btn.disabled = true;
